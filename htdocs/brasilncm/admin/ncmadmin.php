@@ -32,11 +32,16 @@ llxHeader('',$langs->trans("NCM Setup"),$help_url);
 $linkback='<a href="'.DOL_URL_ROOT.'/admin/modules.php">'.$langs->trans("BackToModuleList").'</a>';
 print load_fiche_titre($langs->trans("NCM Setup"),$linkback,'title_setup');
 
-$head=user_admin_prepare_head();
+// $head=user_admin_prepare_head();
 
-dol_fiche_head($head,'card', $langs->trans("User"), 0, 'user');
+// dol_fiche_head($head,'card', $langs->trans("NCM"), 0, 'ncm');
 
-dol_fiche_end();
+print '<table class="border" width="100%"><tr>';
+print '<td width="15%">'.$langs->trans("NCM").'</td><td colspan="'.(2+(($showphoto||$showbarcode)?1:0)).'">';
+print '</td>';
+print '</tr>';
+
+// dol_fiche_end();
 
 llxFooter();
 $db->close();
