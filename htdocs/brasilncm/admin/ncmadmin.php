@@ -36,11 +36,47 @@ print load_fiche_titre($langs->trans("NCM Setup"),$linkback,'title_setup');
 
 // dol_fiche_head($head,'card', $langs->trans("NCM"), 0, 'ncm');
 
+print '<form action="'.$_SERVER['PHP_SELF'].'?id='.$id.'" method="POST">';
+print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
+print '<table class="noborder" width="100%">';
+
+
+print '<tr class="liste_titre">';
+
+print '<td></td>';
+print '<td colspan="3" align="right">';
+if ($tabname[$id] != MAIN_DB_PREFIX.'c_email_templates' || $action != 'edit')
+        {
+        	print '<input type="submit" class="button" name="actionadd" value="'.$langs->trans("Add").'">';
+        }
+print '</td>';
+print "</tr>";
+
+// Start of second table.
 print '<table class="border" width="100%"><tr>';
-print '<td width="15%">'.$langs->trans("NCM").'</td><td colspan="'.(2+(($showphoto||$showbarcode)?1:0)).'">';
+print '<td width="15%">'.$langs->trans("NCM").'</td><td colspan="">';
 print '</td>';
 print '</tr>';
 
+print '<tr>';
+print '<td width="15%">'.$langs->trans("Imposto de Importacao").'</td><td colspan="">';
+print '</td>';
+print '</tr>';
+
+print '<tr>';
+print '<td width="15%">'.$langs->trans("IPI").'</td><td colspan="">';
+print '</td>';
+print '</tr>';
+
+print '<tr>';
+print '<td width="15%">'.$langs->trans("PIS").'</td><td colspan="">';
+print '</td>';
+print '</tr>';
+
+print '<tr>';
+print '<td width="15%">'.$langs->trans("COFINS").'</td><td colspan="">';
+print '</td>';
+print '</tr>';
 // dol_fiche_end();
 
 llxFooter();
