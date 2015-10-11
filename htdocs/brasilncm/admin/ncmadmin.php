@@ -24,28 +24,28 @@
 
 /**
  *   	\file       htdocs/admin/user.php
- *		\ingroup    core
- *		\brief      Page to setup user module
+ *	\ingroup    core
+ *	\brief      Page to setup user module
  */
 
-require '../main.inc.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/usergroups.lib.php';
+require '../../main.inc.php';
+// require_once DOL_DOCUMENT_ROOT.'/core/lib/usergroups.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
+//require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 
 $langs->load("admin");
-$langs->load("members");
-$langs->load("users");
+//$langs->load("members");
+//$langs->load("users");
 
 if (! $user->admin) accessforbidden();
 
-$extrafields = new ExtraFields($db);
+//$extrafields = new ExtraFields($db);
 
 
 /*
  * Action
  */
-if (preg_match('/set_(.*)/',$action,$reg))
+/* if (preg_match('/set_(.*)/',$action,$reg))
 {
     $code=$reg[1];
     if (dolibarr_set_const($db, $code, 1, 'chaine', 0, '', $conf->entity) > 0)
@@ -87,18 +87,20 @@ if ($action == 'sethideinactiveuser')
 		dol_print_error($db);
 	}
 }
+ */
 
 /*
  * View
  */
-
-$help_url='EN:Module_Users|FR:Module_Utilisateurs|ES:M&oacute;dulo_Usuarios';
-llxHeader('',$langs->trans("UsersSetup"),$help_url);
+/*
+	$help_url='EN:Module_Users|FR:Module_Utilisateurs|ES:M&oacute;dulo_Usuarios';
+ */
+llxHeader('',$langs->trans("NCMSetup"),$help_url);
 
 $linkback='<a href="'.DOL_URL_ROOT.'/admin/modules.php">'.$langs->trans("BackToModuleList").'</a>';
-print load_fiche_titre($langs->trans("UsersSetup"),$linkback,'title_setup');
+print load_fiche_titre($langs->trans("NCMSetup"),$linkback,'title_setup');
 
-
+/*
 $head=user_admin_prepare_head();
 
 dol_fiche_head($head,'card', $langs->trans("User"), 0, 'user');
@@ -138,6 +140,7 @@ else
 print '</td></tr>';
 
 print '</table>';
+ */
 
 dol_fiche_end();
 
