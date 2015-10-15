@@ -94,7 +94,7 @@ $colortext='40,40,40';
 $fontsize='12';
 $fontsizesmaller='11';
 $usegradient=1;
-
+$useboldtitle=1;
 
 // Case of option always editable
 if (! isset($conf->global->THEME_ELDY_TOPMENU_BACK1)) $conf->global->THEME_ELDY_TOPMENU_BACK1='140,150,180';    // topmenu (140,160,185)
@@ -453,8 +453,8 @@ div.divsearchfield {
 	float: <?php print $left; ?>;
 	margin-<?php print $right; ?>: 12px;
     margin-<?php print $left; ?>: 2px;
-	margin-top: 3px;
-    margin-bottom: 3px;
+	margin-top: 4px;
+    margin-bottom: 4px;
   	padding-left: 2px;
 }
 div.confirmmessage {
@@ -489,7 +489,7 @@ div.confirmmessage {
 .maxwidth100 { max-width: 100px; }
 .maxwidth200 { max-width: 200px; }
 .maxwidth300 { max-width: 300px; }
-.titlefield { width: 25%; }
+.titlefield { width: 30%; }
 <?php if (! empty($dol_optimize_smallscreen)) { ?>
 .hideonsmartphone { display: none; }
 .noenlargeonsmartphone { width : 50px !important; display: inline !important; }
@@ -625,7 +625,7 @@ div.divphotoref {
 div.statusref {
 	float: right;
 	padding-right: 12px;
-	margin-top: 7px;
+	margin-top: 6px;
 	margin-bottom: 10px;
 }
 img.photoref {
@@ -664,12 +664,12 @@ div#id-top {
 <?php } else { ?>
 	background: rgb(<?php echo $colorbackhmenu1 ?>);
 	<?php if ($usegradient) { ?>
-	background-image: linear-gradient(top, rgba(255,255,255,.3) 0%, rgba(0,0,0,.3) 100%);
-	background-image: -o-linear-gradient(top, rgba(255,255,255,.3) 0%, rgba(0,0,0,.3) 100%);
-	background-image: -moz-linear-gradient(top, rgba(255,255,255,.3) 0%, rgba(0,0,0,.3) 100%);
-	background-image: -webkit-linear-gradient(top, rgba(255,255,255,.3) 0%, rgba(0,0,0,.3) 100%);
-	background-image: -ms-linear-gradient(top, rgba(255,255,255,.3) 0%, rgba(0,0,0,.3) 100%);
-	background-image: -webkit-gradient( linear, left top, left bottom, color-stop(0, rgba(255,255,255,.3)), color-stop(1, rgba(0,0,0,.3)) );
+	background-image: linear-gradient(top, rgba(255,255,255,.1) 0%, rgba(0,0,0,.4) 100%);
+	background-image: -o-linear-gradient(top, rgba(255,255,255,.1) 0%, rgba(0,0,0,.4) 100%);
+	background-image: -moz-linear-gradient(top, rgba(255,255,255,.1) 0%, rgba(0,0,0,.4) 100%);
+	background-image: -webkit-linear-gradient(top, rgba(255,255,255,.1) 0%, rgba(0,0,0,.4) 100%);
+	background-image: -ms-linear-gradient(top, rgba(255,255,255,.1) 0%, rgba(0,0,0,.4) 100%);
+	background-image: -webkit-gradient( linear, left top, left bottom, color-stop(0, rgba(255,255,255,.1)), color-stop(1, rgba(0,0,0,.4)) );
 	<?php } ?>
 	<?php if ($disableimages) { ?>
 	height: 28px;
@@ -743,12 +743,12 @@ ul.tmenu {	/* t r b l */
 ul.tmenu li {	/* We need this to have background color when menu entry wraps on new lines */
 	background: rgb(<?php echo $colorbackhmenu1 ?>);
 	<?php if ($usegradient) { ?>
-	background-image: linear-gradient(top, rgba(255,255,255,.3) 0%, rgba(0,0,0,.3) 100%);
-	background-image: -o-linear-gradient(top, rgba(255,255,255,.3) 0%, rgba(0,0,0,.3) 100%);
-	background-image: -moz-linear-gradient(top, rgba(255,255,255,.3) 0%, rgba(0,0,0,.3) 100%);
-	background-image: -webkit-linear-gradient(top, rgba(255,255,255,.3) 0%, rgba(0,0,0,.3) 100%);
-	background-image: -ms-linear-gradient(top, rgba(255,255,255,.3) 0%, rgba(0,0,0,.3) 100%);
-	background-image: -webkit-gradient( linear, left top, left bottom, color-stop(0, rgba(255,255,255,.3)), color-stop(1, rgba(0,0,0,.3)) );
+	background-image: linear-gradient(top, rgba(255,255,255,.1) 0%, rgba(0,0,0,.4) 100%);
+	background-image: -o-linear-gradient(top, rgba(255,255,255,.1) 0%, rgba(0,0,0,.4) 100%);
+	background-image: -moz-linear-gradient(top, rgba(255,255,255,.1) 0%, rgba(0,0,0,.4) 100%);
+	background-image: -webkit-linear-gradient(top, rgba(255,255,255,.1) 0%, rgba(0,0,0,.4) 100%);
+	background-image: -ms-linear-gradient(top, rgba(255,255,255,.1) 0%, rgba(0,0,0,.4) 100%);
+	background-image: -webkit-gradient( linear, left top, left bottom, color-stop(0, rgba(255,255,255,.1)), color-stop(1, rgba(0,0,0,.4)) );
 	<?php } ?>
 }
 li.tmenu, li.tmenusel {
@@ -766,11 +766,11 @@ li.tmenu, li.tmenusel {
 	font-weight: normal;
 }
 li.tmenusel, li.tmenu:hover {
-    background-image: -o-linear-gradient(bottom, rgba(250,250,250,0.3) 0%, rgba(0,0,0,0.3) 100%) !important;
-    background-image: -moz-linear-gradient(bottom, rgba(250,250,250,0.3) 0%, rgba(0,0,0,0.3) 100%) !important;
-    background-image: -webkit-linear-gradient(bottom, rgba(0,0,0,0.3) 0%, rgba(250,250,250,0) 100%) !important;
-    background-image: -ms-linear-gradient(bottom, rgba(250,250,250,0.3) 0%, rgba(0,0,0,0.3) 100%) !important;
-    background-image: linear-gradient(bottom, rgba(250,250,250,0.3) 0%, rgba(0,0,0,0.3) 100%) !important;
+    background-image: -o-linear-gradient(bottom, rgba(250,250,250,0.3) 0%, rgba(0,0,0,0.5) 100%) !important;
+    background-image: -moz-linear-gradient(bottom, rgba(0,0,0,0.5) 0%, rgba(250,250,250,0) 100%) !important;
+    background-image: -webkit-linear-gradient(bottom, rgba(0,0,0,0.5) 0%, rgba(250,250,250,0) 100%) !important;
+    background-image: -ms-linear-gradient(bottom, rgba(250,250,250,0.3) 0%, rgba(0,0,0,0.5) 100%) !important;
+    background-image: linear-gradient(bottom, rgba(250,250,250,0.3) 0%, rgba(0,0,0,0.5) 100%) !important;
 	background: rgb(<?php echo $colorbackhmenu1 ?>);
 }
 .tmenuend .tmenuleft { width: 0px; }
@@ -1073,7 +1073,7 @@ div.login_block_other { padding-top: 3px; text-align: right; }
 	height: 16px;
 }
 .alogin, .alogin:hover {
-	color: #<?php echo $colortextbackvmenu; ?> !important;
+	color: #<?php echo $colortextbackhmenu; ?> !important;
 	font-weight: normal !important;
 	font-size: <?php echo $fontsizesmaller; ?>px !important;
 	padding-top: 2px;
@@ -1970,7 +1970,7 @@ td.border, div.tagtable div div.border {
 }
 
 .table-key-border-col {
-	width: 25%;
+	/* width: 25%; */
 	vertical-align:top;
 }
 .table-val-border-col {
@@ -2133,6 +2133,9 @@ div.pagination li.pagination span {
 div.pagination li.pagination span.inactive {
   cursor: default;
 }
+/*div.pagination li.litext {
+	padding-top: 8px;
+}*/
 div.pagination li.litext a {
   border: none;
   padding-right: 10px;
@@ -2354,7 +2357,7 @@ div.liste_titre, tr.liste_titre, tr.liste_titre_sel, form.liste_titre, form.list
 	background-image: -ms-linear-gradient(bottom, rgba(0,0,0,0.1) 0%, rgba(250,250,250,0.3) 100%);
 	background-image: linear-gradient(bottom, rgba(0,0,0,0.1) 0%, rgba(250,250,250,0.3) 100%);
 	<?php } ?>
-	font-weight: bold;
+	font-weight: <?php echo $useboldtitle?'bold':'normal'; ?>;
 
     color: #<?php echo $colortexttitle; ?>;
     font-family: <?php print $fontlist ?>;
@@ -2368,7 +2371,7 @@ tr.liste_titre th, th.liste_titre, form.liste_titre div, div.liste_titre
 tr.liste_titre th, th.liste_titre, tr.liste_titre td, td.liste_titre, form.liste_titre div, div.liste_titre
 {
     font-family: <?php print $fontlist ?>;
-    font-weight: bold;
+    font-weight: <?php echo $useboldtitle?'bold':'normal'; ?>;
     vertical-align: middle;
 }
 tr.liste_titre th a, th.liste_titre a, tr.liste_titre td a, td.liste_titre a, form.liste_titre div a, div.liste_titre a {
@@ -2484,7 +2487,7 @@ tr.box_titre {
 
 	color: #<?php echo $colortexttitle; ?>;
     font-family: <?php print $fontlist ?>, sans-serif;
-    font-weight: bold;
+    font-weight: <?php echo $useboldtitle?'bold':'normal'; ?>;
     border-bottom: 1px solid #FDFFFF;
     white-space: nowrap;
 }
