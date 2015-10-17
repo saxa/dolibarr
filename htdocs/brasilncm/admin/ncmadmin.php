@@ -45,21 +45,18 @@ print '<table class="noborder" width="100%">';
 $fieldname = array("NCM", "ImpImport", "IPI", "PIS", "COFINS");
 
 print '<table class="border" width="100%"><tr class="liste_titre">';
-//print '<th width="20%">'.$langs->trans("NCM").'</th><th width="20%">'.$langs->trans("ImpImport").'</th><th width="20%">'.$langs->trans("IPI").'</th><th width="20%">'.$langs->trans("PIS").'</th><th width="20%">'.$langs->trans("COFINS").'</th>';
-//print '</tr>';
 
 foreach ($fieldname as $fname)
 	print '<th width="20%">'.$langs->trans("$fname").'</th>';
 
 print '</tr>';
 
+print '<tr>';
 foreach ($fieldname as $fname)
 	print '<td width="20%"><input type="text" name="'.$fname.'"></td>';
 
-//print '<tr class="liste_titre">';
 
-print '<td></td>';
-print '<td colspan="3" align="right">';
+print '<tr><td colspan="5" align="right">';
 if ($tabname[$id] != MAIN_DB_PREFIX.'llx_brasil_ncm' || $action != 'edit')
         {
         	print '<input type="submit" class="button" name="actionadd" value="'.$langs->trans("Add").'">';
