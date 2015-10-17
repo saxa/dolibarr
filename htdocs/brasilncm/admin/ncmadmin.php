@@ -40,7 +40,8 @@ print load_fiche_titre($langs->trans("NCMSetup"),$linkback,'title_setup');
 
 print $langs->trans("NcmSetupDesc")."<br>\n";
 print '<form action="'.$_SERVER['PHP_SELF'].'?id='.$id.'" method="POST">';
-print '<table class="noborder" width="100%">';
+//print '<table class="noborder" width="100%">';
+//print '</table>';
 
 $fieldname = array("NCM", "ImpImport", "IPI", "PIS", "COFINS");
 
