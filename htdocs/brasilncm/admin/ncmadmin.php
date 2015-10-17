@@ -18,7 +18,9 @@
 require '../../main.inc.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 
+$langs->setDefaultLang('pt_BR'); 
 $langs->load("admin");
+$langs->load("brasilncm");
 
 if (! $user->admin) accessforbidden();
 
@@ -26,58 +28,56 @@ if (! $user->admin) accessforbidden();
  * View
  */
 
-llxHeader('',$langs->trans("NCM Setup"),$help_url);
+llxHeader('',$langs->trans("NCMSetup"),$help_url);
 
+$form=new Form($db);
 
 $linkback='<a href="'.DOL_URL_ROOT.'/admin/modules.php">'.$langs->trans("BackToModuleList").'</a>';
-print load_fiche_titre($langs->trans("NCM Setup"),$linkback,'title_setup');
 
-// $head=user_admin_prepare_head();
+print load_fiche_titre($langs->trans("NCMSetup"),$linkback,'title_setup');
 
-// dol_fiche_head($head,'card', $langs->trans("NCM"), 0, 'ncm');
 
+
+print $langs->trans("NcmSetupDesc")."<br>\n";
 print '<form action="'.$_SERVER['PHP_SELF'].'?id='.$id.'" method="POST">';
-print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
 print '<table class="noborder" width="100%">';
 
+$fieldname = array("NCM", "ImpImport", "IPI", "PIS", "COFINS");
 
-print '<tr class="liste_titre">';
+print '<table class="border" width="100%"><tr class="liste_titre">';
+//print '<th width="20%">'.$langs->trans("NCM").'</th><th width="20%">'.$langs->trans("ImpImport").'</th><th width="20%">'.$langs->trans("IPI").'</th><th width="20%">'.$langs->trans("PIS").'</th><th width="20%">'.$langs->trans("COFINS").'</th>';
+//print '</tr>';
+
+foreach ($fieldname as $fname)
+	print '<th width="20%">'.$langs->trans("$fname").'</th>';
+
+print '</tr>';
+
+foreach ($fieldname as $fname)
+	print '<td width="20%"><input type="text" name="'.$fname.'"></td>';
+
+//print '<tr class="liste_titre">';
 
 print '<td></td>';
 print '<td colspan="3" align="right">';
-if ($tabname[$id] != MAIN_DB_PREFIX.'c_email_templates' || $action != 'edit')
+if ($tabname[$id] != MAIN_DB_PREFIX.'llx_brasil_ncm' || $action != 'edit')
         {
         	print '<input type="submit" class="button" name="actionadd" value="'.$langs->trans("Add").'">';
         }
 print '</td>';
-print "</tr>";
+print '</tr>';
+print '</table>';
+print '</form>';
 
 // Start of second table.
-print '<table class="border" width="100%"><tr>';
-print '<td width="15%">'.$langs->trans("NCM").'</td><td colspan="">';
-print '</td>';
-print '</tr>';
+print '<br><br>';
+print '<table class="border" width="100%"><tr class="liste_titre">';
 
-print '<tr>';
-print '<td width="15%">'.$langs->trans("Imposto de Importacao").'</td><td colspan="">';
-print '</td>';
-print '</tr>';
+foreach ($fieldname as $fname)
+	print '<th width="20%">'.$langs->trans("$fname").'</th>';
 
-print '<tr>';
-print '<td width="15%">'.$langs->trans("IPI").'</td><td colspan="">';
-print '</td>';
-print '</tr>';
-
-print '<tr>';
-print '<td width="15%">'.$langs->trans("PIS").'</td><td colspan="">';
-print '</td>';
-print '</tr>';
-
-print '<tr>';
-print '<td width="15%">'.$langs->trans("COFINS").'</td><td colspan="">';
-print '</td>';
-print '</tr>';
 // dol_fiche_end();
+
 
 llxFooter();
 $db->close();
