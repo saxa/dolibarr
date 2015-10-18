@@ -36,33 +36,24 @@ $linkback='<a href="'.DOL_URL_ROOT.'/admin/modules.php">'.$langs->trans("BackToM
 
 print load_fiche_titre($langs->trans("NCMSetup"),$linkback,'title_setup');
 
-
-
 print $langs->trans("NcmSetupDesc")."<br>\n";
-print '<form action="'.$_SERVER['PHP_SELF'].'?id='.$id.'" method="POST">';
-//print '<table class="noborder" width="100%">';
-//print '</table>';
 
 $fieldname = array("NCM", "ImpImport", "IPI", "PIS", "COFINS");
 
-print '<table class="border" width="100%"><tr class="liste_titre">';
+// Insert fields form
+print '<form action="" method="POST">';
+print '<table class="noborder" width="100%"><tr class="liste_titre">';
 
 foreach ($fieldname as $fname)
 	print '<th width="20%">'.$langs->trans("$fname").'</th>';
 
+print '<th></th>';
 print '</tr>';
 
 print '<tr>';
 foreach ($fieldname as $fname)
 	print '<td width="20%"><input type="text" name="'.$fname.'"></td>';
-
-
-print '<tr><td colspan="5" align="right">';
-if ($tabname[$id] != MAIN_DB_PREFIX.'llx_brasil_ncm' || $action != 'edit')
-        {
-        	print '<input type="submit" class="button" name="actionadd" value="'.$langs->trans("Add").'">';
-        }
-print '</td>';
+print '<td align="right"><input type="submit" class="button" name="actionadd" value="'.$langs->trans("Add").'"></td>';
 print '</tr>';
 print '</table>';
 print '</form>';
@@ -73,9 +64,6 @@ print '<table class="border" width="100%"><tr class="liste_titre">';
 
 foreach ($fieldname as $fname)
 	print '<th width="20%">'.$langs->trans("$fname").'</th>';
-
-// dol_fiche_end();
-
 
 llxFooter();
 $db->close();
