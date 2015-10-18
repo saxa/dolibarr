@@ -38,21 +38,27 @@ print load_fiche_titre($langs->trans("NCMSetup"),$linkback,'title_setup');
 
 print $langs->trans("NcmSetupDesc")."<br>\n";
 
-$fieldname = array("NCM", "ImpImport", "IPI", "PIS", "COFINS");
+$fname = array("NCM", "Description", "ImpImport", "IPI", "PIS", "COFINS");
 
 // Insert fields form
 print '<form action="" method="POST">';
 print '<table class="noborder" width="100%"><tr class="liste_titre">';
-
-foreach ($fieldname as $fname)
-	print '<th width="20%">'.$langs->trans("$fname").'</th>';
-
-print '<th></th>';
+print '<th width="10%">'.$langs->trans("$fname[0]").'</th>';
+print '<th width="50%">'.$langs->trans("$fname[1]").'</th>';
+print '<th width="10%">'.$langs->trans("$fname[2]").'</th>';
+print '<th width="10%">'.$langs->trans("$fname[3]").'</th>';
+print '<th width="10%">'.$langs->trans("$fname[4]").'</th>';
+print '<th width="10%">'.$langs->trans("$fname[5]").'</th>';
+print '<th></th>'; // Permit to button to align correctly.
 print '</tr>';
 
 print '<tr>';
-foreach ($fieldname as $fname)
-	print '<td width="20%"><input type="text" name="'.$fname.'"></td>';
+print '<td width="10%"><input type="text" size="10" name="'.$langs->trans("$fname[0]").'"></td>';
+print '<td width="50%"><input type="text" size="80" name="'.$langs->trans("$fname[1]").'"></td>';
+print '<td width="10%"><input type="text" size="10" name="'.$langs->trans("$fname[2]").'"></td>';
+print '<td width="10%"><input type="text" size="10" name="'.$langs->trans("$fname[3]").'"></td>';
+print '<td width="10%"><input type="text" size="10" name="'.$langs->trans("$fname[4]").'"></td>';
+print '<td width="10%"><input type="text" size="10" name="'.$langs->trans("$fname[5]").'"></td>';
 print '<td align="right"><input type="submit" class="button" name="actionadd" value="'.$langs->trans("Add").'"></td>';
 print '</tr>';
 print '</table>';
@@ -61,12 +67,14 @@ print '</form>';
 // Start of second table.
 print '<br><br>';
 print '<table class="noborder" width="100%"><tr class="liste_titre">';
-
-foreach ($fieldname as $fname)
-	print '<th width="20%">'.$langs->trans("$fname").'</th>';
-
+print '<th width="10%">'.$langs->trans("$fname[0]").'</th>';
+print '<th width="50%">'.$langs->trans("$fname[1]").'</th>';
+print '<th width="10%">'.$langs->trans("$fname[2]").'</th>';
+print '<th width="10%">'.$langs->trans("$fname[3]").'</th>';
+print '<th width="10%">'.$langs->trans("$fname[4]").'</th>';
+print '<th width="10%">'.$langs->trans("$fname[5]").'</th>';
 print '</tr>';
-print '<tr><td width="20%">';
+print '<tr><td width="10%">';
 // Insert loop for listing added values in the database.
 print '</td></tr>';
 print '</table>';
