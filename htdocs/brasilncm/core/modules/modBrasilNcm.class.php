@@ -256,7 +256,7 @@ class modBrasilNcm extends DolibarrModules
 	{
 		$sql = array();
 
-		//$this->_load_tables('/brasilncm/sql/');
+		$this->_load_tables('/brasilncm/sql/');
 
 		return $this->_init($sql, $options);
 	}
