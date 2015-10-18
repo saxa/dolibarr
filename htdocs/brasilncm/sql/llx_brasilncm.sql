@@ -19,13 +19,12 @@
 create table llx_brasil_ncm
 (
 	  rowid           integer AUTO_INCREMENT PRIMARY KEY,
-	  fk_customscode  integer,
-	  ncm_nr          integer,
+	  datec           datetime,
+	  fk_customcode   integer,
+	  ncm_nr          integer NOT NULL,
 	  ncm_descr       varchar(255),
 	  imp_import      integer,
 	  ipi             integer,
 	  pis             integer,
-	  cofins          integer,
-	  label           varchar(255),
-	  type            varchar(24) NOT NULL
+	  cofins          integer
 )ENGINE=innodb;
