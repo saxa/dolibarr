@@ -60,10 +60,16 @@ print '</form>';
 
 // Start of second table.
 print '<br><br>';
-print '<table class="border" width="100%"><tr class="liste_titre">';
+print '<table class="noborder" width="100%"><tr class="liste_titre">';
 
 foreach ($fieldname as $fname)
 	print '<th width="20%">'.$langs->trans("$fname").'</th>';
+
+print '</tr>';
+print '<tr><td width="20%">';
+// Insert loop for listing added values in the database.
+print '</td></tr>';
+print '</table>';
 
 llxFooter();
 $db->close();
