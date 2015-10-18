@@ -23,8 +23,8 @@ create table llx_brasil_ncm
 	  fk_customcode   integer,
 	  ncm_nr          integer NOT NULL,
 	  ncm_descr       varchar(255),
-	  imp_import      integer,
-	  ipi             integer,
-	  pis             integer,
-	  cofins          integer
+	  imp_import      float,
+	  ipi             float,
+	  pis             float,
+	  cofins          float
 )ENGINE=innodb;
