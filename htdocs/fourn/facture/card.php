@@ -716,7 +716,7 @@ if (empty($reshook))
 	            // Product not selected
 	            $error++;
 	            $langs->load("errors");
-		        setEventMessage($langs->trans("ErrorFieldRequired",$langs->transnoentitiesnoconv("ProductOrService")), 'errors');
+		        setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("ProductOrService")), null, 'errors');
 	        }
 	        if ($idprod == -1)
 	        {
@@ -917,7 +917,7 @@ if (empty($reshook))
 	    $upload_dir_tmp = $vardir.'/temp';
 
 		// TODO Delete only files that was uploaded from email form
-	    dol_remove_file_process($_POST['removedfile'],0);
+	    dol_remove_file_process(GETPOST('removedfile','alpha'),0);
 	    $action='presend';
 	}
 

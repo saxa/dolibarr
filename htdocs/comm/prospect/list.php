@@ -159,7 +159,8 @@ $sts = array(-1,0,1,2,3);
 
 
 // Initialize technical object to manage hooks of thirdparties. Note that conf->hooks_modules contains array array
-$hookmanager->initHooks(array('prospectlist'));
+$contextpage='prospectlist';
+$hookmanager->initHooks(array($contextpage));
 $extrafields = new ExtraFields($db);
 
 // fetch optionals attributes and labels
@@ -167,7 +168,7 @@ $extralabels = $extrafields->fetch_name_optionals_label('thirdparty');
 $search_array_options=$extrafields->getOptionalsFromPost($extralabels,'','search_');
 
 // Do we click on purge search criteria ?
-if (GETPOST("button_removefilter_x") || GETPOST("button_removefilter")) // Both test are required to be compatible with all browsers
+if (GETPOST("button_removefilter_x") || GETPOST("button_removefilter.x") || GETPOST("button_removefilter")) // Both test are required to be compatible with all browsers
 {
     $socname="";
 	$stcomm="";
@@ -271,7 +272,7 @@ if ($socname)
 	$sortfield = "s.nom";
 	$sortorder = "ASC";
 }
-// Extra fields
+// Add where from extra fields
 foreach ($search_array_options as $key => $val)
 {
     $crit=$val;
@@ -339,15 +340,14 @@ if ($resql)
  	if ($search_status != '') $param.='&search_status='.$search_status;
  	if ($search_country != '') $param.='&amp;search_country='.$search_country;
  	if ($search_type_thirdparty != '') $param.='&amp;search_type_thirdparty='.$search_type_thirdparty;
-    foreach ($search_array_options as $key => $val)
+    // Add $param from extra fields
+ 	foreach ($search_array_options as $key => $val)
     {
         $crit=$val;
         $tmpkey=preg_replace('/search_options_/','',$key);
         $param.='&search_options_'.$tmpkey.'='.urlencode($val);
     } 	
- 	// $param and $urladd should have the same value
- 	$urladd = $param;
-
+ 	
 	print_barre_liste($langs->trans("ListOfProspects"), $page, $_SERVER["PHP_SELF"], $param, $sortfield,$sortorder,'',$num,$nbtotalofrecords,'title_companies.png');
 
 
@@ -359,19 +359,22 @@ if ($resql)
 	if (! empty($conf->categorie->enabled))
 	{
 		require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+		$moreforfilter.='<div class="divsearchfield">';
 	 	$moreforfilter.=$langs->trans('Categories'). ': ';
 		$moreforfilter.=$formother->select_categories(Categorie::TYPE_CUSTOMER,$search_categ,'search_categ',1);
-	 	$moreforfilter.=' &nbsp; &nbsp; &nbsp; ';
+	 	$moreforfilter.='</div>';
 	}
  	// If the user can view prospects other than his'
  	if ($user->rights->societe->client->voir || $socid)
  	{
+	 	$moreforfilter.='<div class="divsearchfield">';
 	 	$moreforfilter.=$langs->trans('SalesRepresentatives'). ': ';
 		$moreforfilter.=$formother->select_salesrepresentatives($search_sale,'search_sale',$user);
+		$moreforfilter.='</div>';
  	}
  	if ($moreforfilter)
 	{
-		print '<div class="liste_titre">';
+		print '<div class="liste_titre liste_titre_bydiv centpercent">';
 	    print $moreforfilter;
     	$parameters=array();
     	$reshook=$hookmanager->executeHooks('printFieldPreListTitle',$parameters);    // Note that $action and $object may have been modified by hook
@@ -379,13 +382,13 @@ if ($resql)
 	    print '</div>';
 	}
 
-	print '<table class="liste" width="100%">';
+    print '<table class="tagtable liste'.($moreforfilter?" listwithfilterbefore":"").'">';
 
 	print '<tr class="liste_titre">';
 	print_liste_field_titre($langs->trans("Company"),$_SERVER["PHP_SELF"],"s.nom","",$param,'',$sortfield,$sortorder);
 	print_liste_field_titre($langs->trans("Zip"),$_SERVER["PHP_SELF"],"s.zip","",$param,"",$sortfield,$sortorder);
 	print_liste_field_titre($langs->trans("Town"),$_SERVER["PHP_SELF"],"s.town","",$param,"",$sortfield,$sortorder);
-	print_liste_field_titre($langs->trans("State"),$_SERVER["PHP_SELF"],"s.fk_departement","",$param,'align="center"',$sortfield,$sortorder);
+	print_liste_field_titre($langs->trans("StateShort"),$_SERVER["PHP_SELF"],"s.fk_departement","",$param,'align="center"',$sortfield,$sortorder);
 	print_liste_field_titre($langs->trans("Country"),$_SERVER["PHP_SELF"],"country.code_iso","",$param,'align="center"',$sortfield,$sortorder);
 	print_liste_field_titre($langs->trans("ThirdPartyType"),$_SERVER["PHP_SELF"],"typent.code","",$param,'align="center"',$sortfield,$sortorder);
 	print_liste_field_titre($langs->trans("DateCreation"),$_SERVER["PHP_SELF"],"s.datec","",$param,'align="center"',$sortfield,$sortorder);
@@ -427,13 +430,13 @@ if ($resql)
     print '<input type="text" class="flat" name="search_state" size="8" value="'.$search_state.'">';
     print '</td>';
     print '<td class="liste_titre" align="center">';
-    print $form->select_country($search_country,'search_country');
+    print $form->select_country($search_country,'search_country','',0,'maxwidth100');
     print '</td>';
     print '<td class="liste_titre" align="center">';
     print $form->selectarray("search_type_thirdparty", $formcompany->typent_array(0), $search_type_thirdparty, 0, 0, 0, '', 0, 0, 0, (empty($conf->global->SOCIETE_SORT_ON_TYPEENT)?'ASC':$conf->global->SOCIETE_SORT_ON_TYPEENT));
     print '</td>';
     print '<td align="center" class="liste_titre">';
-	print '<input class="flat" type="text" size="10" name="search_datec" value="'.$search_datec.'">';
+	print '<input class="flat" type="text" size="6" name="search_datec" value="'.$search_datec.'">';
     print '</td>';
 
  	// Prospect level

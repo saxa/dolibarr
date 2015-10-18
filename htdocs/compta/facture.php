@@ -277,7 +277,7 @@ if (empty($reshook))
 		$date = dol_mktime(12, 0, 0, $_POST['invoicedatemonth'], $_POST['invoicedateday'], $_POST['invoicedateyear']);
 		if (empty($date))
 		{
-		    setEventMessage($langs->trans("ErrorFieldRequired",$langs->transnoentitiesnoconv("Date")),'errors');
+		    setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Date")), null, 'errors');
 		    header('Location: '.$_SERVER["PHP_SELF"].'?facid='.$id.'&action=editinvoicedate');
 		    exit;
 		}
@@ -550,7 +550,7 @@ if (empty($reshook))
 			$result = $object->set_paid($user, $close_code, $close_note);
 			if ($result<0) setEventMessage($object->error,'errors');
 		} else {
-			setEventMessage($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Reason")), 'errors');
+			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Reason")), null, 'errors');
 		}
 	} // Classify "abandoned"
 	else if ($action == 'confirm_canceled' && $confirm == 'yes') {
@@ -561,7 +561,7 @@ if (empty($reshook))
 			$result = $object->set_canceled($user, $close_code, $close_note);
 			if ($result<0) setEventMessage($object->error,'errors');
 		} else {
-			setEventMessage($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Reason")), 'errors');
+			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Reason")), null, 'errors');
 		}
 	}
 
@@ -671,12 +671,12 @@ if (empty($reshook))
 			if (empty($dateinvoice))
 			{
 				$error++;
-				setEventMessage($langs->trans("ErrorFieldRequired",$langs->transnoentitiesnoconv("Date")),'errors');
+				setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Date")), null, 'errors');
 			}
 
 			if (! ($_POST['fac_replacement'] > 0)) {
 				$error ++;
-				setEventMessage($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("ReplaceInvoice")), 'errors');
+				setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("ReplaceInvoice")), null, 'errors');
 			}
 
 			if (! $error) {
@@ -716,14 +716,14 @@ if (empty($reshook))
 			if (! ($_POST['fac_avoir'] > 0))
 			{
 				$error ++;
-				setEventMessage($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("CorrectInvoice")), 'errors');
+				setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("CorrectInvoice")), null, 'errors');
 			}
 
 			$dateinvoice = dol_mktime(12, 0, 0, $_POST['remonth'], $_POST['reday'], $_POST['reyear']);
 			if (empty($dateinvoice))
 			{
 				$error ++;
-				setEventMessage($langs->trans("ErrorFieldRequired", $langs->trans("Date")), 'errors');
+				setEventMessages($langs->trans("ErrorFieldRequired", $langs->trans("Date")), null, 'errors');
 			}
 
 			if (! $error)
@@ -815,7 +815,7 @@ if (empty($reshook))
 			if (empty($dateinvoice))
 			{
 				$error++;
-				setEventMessage($langs->trans("ErrorFieldRequired",$langs->transnoentitiesnoconv("Date")),'errors');
+				setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Date")), null, 'errors');
 			}
 
 			if (! $error)
@@ -843,14 +843,14 @@ if (empty($reshook))
 			if (GETPOST('socid', 'int') < 1)
 			{
 				$error ++;
-				setEventMessage($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Customer")), 'errors');
+				setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Customer")), null, 'errors');
 			}
 
 			$dateinvoice = dol_mktime(12, 0, 0, $_POST['remonth'], $_POST['reday'], $_POST['reyear']);
 			if (empty($dateinvoice))
 			{
 				$error++;
-				setEventMessage($langs->trans("ErrorFieldRequired",$langs->transnoentitiesnoconv("Date")),'errors');
+				setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Date")), null, 'errors');
 			}
 
 			if (! $error)
@@ -1245,7 +1245,7 @@ if (empty($reshook))
 		}
 		if (GETPOST('prod_entry_mode') == 'free' && empty($idprod) && (! ($price_ht >= 0) || $price_ht == '')) 	// Unit price can be 0 but not ''
 		{
-			setEventMessage($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("UnitPriceHT")), 'errors');
+			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("UnitPriceHT")), null, 'errors');
 			$error ++;
 		}
 		if ($qty == '') {
@@ -1555,7 +1555,7 @@ if (empty($reshook))
 
 			// Check parameters
 			if (GETPOST('type') < 0) {
-				setEventMessage($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Type")), 'errors');
+				setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Type")), null, 'errors');
 				$error ++;
 			}
 		}
@@ -1790,6 +1790,9 @@ if (empty($reshook))
 				dol_print_error($db);
 			}
 		}
+
+		if ($error)
+			$action = 'edit_extras';
 	}
 }
 
@@ -2973,16 +2976,16 @@ else if ($id > 0 || ! empty($ref))
 
 	print '<td rowspan="' . $nbrows . '" colspan="2" valign="top">';
 
-	print '<table class="nobordernopadding" width="100%">';
+	print '<table class="nobordernopadding paymenttable" width="100%">';
 
 	// List of payments already done
 	print '<tr class="liste_titre">';
-	print '<td>' . ($object->type == Facture::TYPE_CREDIT_NOTE ? $langs->trans("PaymentsBack") : $langs->trans('Payments')) . '</td>';
-	print '<td>' . $langs->trans('Type') . '</td>';
+	print '<td class="liste_titre">' . ($object->type == Facture::TYPE_CREDIT_NOTE ? $langs->trans("PaymentsBack") : $langs->trans('Payments')) . '</td>';
+	print '<td class="liste_titre">' . $langs->trans('Type') . '</td>';
 	if (! empty($conf->banque->enabled))
-		print '<td align="right">' . $langs->trans('BankAccount') . '</td>';
-	print '<td align="right">' . $langs->trans('Amount') . '</td>';
-	print '<td width="18">&nbsp;</td>';
+		print '<td class="liste_titre" align="right">' . $langs->trans('BankAccount') . '</td>';
+	print '<td class="liste_titre" align="right">' . $langs->trans('Amount') . '</td>';
+	print '<td class="liste_titre" width="18">&nbsp;</td>';
 	print '</tr>';
 
 	$var = true;
@@ -3033,7 +3036,7 @@ else if ($id > 0 || ! empty($ref))
 				$i ++;
 			}
 		} else {
-			print '<tr ' . $bc [$var] . '><td colspan="' . $nbcols . '">' . $langs->trans("None") . '</td><td></td><td></td></tr>';
+			print '<tr ' . $bc[false] . '><td colspan="' . $nbcols . '">' . $langs->trans("None") . '</td><td></td><td></td></tr>';
 		}
 		// }
 		$db->free($result);
