@@ -17,6 +17,8 @@
 
 require '../../main.inc.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
+include_once(DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php');
+dol_include_once('/brasilncm/class/brasilncm.class.php');
 
 $langs->setDefaultLang('pt_BR'); 
 $langs->load("admin");
@@ -65,6 +67,46 @@ print '</tr>';
 print '</table>';
 print '</form>';
 
+// Start searching and getting the values.
+// Create the sql search query
+$sql = "SELECT";
+$sql .= " t.rowid,";
+$sql .= " t.datec,";
+$sql .= " t.fk_customcode,";
+$sql .= " t.ncm_nr,";
+$sql .= " t.ncm_descr,";
+$sql .= " t.imp_import,";
+$sql .= " t.ipi,";
+$sql .= " t.pis,";
+$sql .= " t.cofins";
+$sql.= " FROM ".MAIN_DB_PREFIX."brasil_ncm as t";
+$sql.= " WHERE 1 = 1";
+// Count total nb of records
+$nbtotalofrecords = 0;
+if (empty($conf->global->MAIN_DISABLE_FULL_SCANLIST))
+{
+	$result = $db->query($sql);
+	$nbtotalofrecords = $db->num_rows($result);
+}	
+
+$resql=$db->query($sql);
+if ($resql)
+{
+	$num = $db->num_rows($resql);
+    
+//    	print '<table class="liste">'."\n";
+    
+        // Fields title
+//        print '<tr class="liste_titre">';
+        
+//print_liste_field_titre($langs->trans('ncm_nr'),$_SERVER['PHP_SELF'],'t.ncm_nr','',$param,'width="10%"',$sortfield,$sortorder);
+//print_liste_field_titre($langs->trans('ncm_descr'),$_SERVER['PHP_SELF'],'t.ncm_descr','',$param,'width="50%"',$sortfield,$sortorder);
+//print_liste_field_titre($langs->trans('imp_import'),$_SERVER['PHP_SELF'],'t.imp_import','',$param,'width="10%"',$sortfield,$sortorder);
+//print_liste_field_titre($langs->trans('ipi'),$_SERVER['PHP_SELF'],'t.ipi','',$param,'width="10%"',$sortfield,$sortorder);
+//print_liste_field_titre($langs->trans('pis'),$_SERVER['PHP_SELF'],'t.pis','',$param,'width="10%"',$sortfield,$sortorder);
+//print_liste_field_titre($langs->trans('cofins'),$_SERVER['PHP_SELF'],'t.cofins','',$param,'width="10%"',$sortfield,$sortorder);
+}
+                
 // Start of second table.
 print '<br><br>';
 print '<table class="noborder" width="100%"><tr class="liste_titre">';
@@ -77,8 +119,28 @@ print '<th width="10%">'.$langs->trans("$fname[5]").'</th>';
 print '</tr>';
 print '<tr><td width="10%">';
 // Insert loop for listing added values in the database.
+$i = 0;
+while ($i < $num)
+{
+	$obj = $db->fetch_object($resql);
+	if ($obj)
+	{
+		// You can use here results
+		print '<tr>';
+		print '<td width="10%">'.$obj->ncm_nr.'</td>';
+		print '<td width="50%">'.$obj->ncm_descr.'</td>';
+		print '<td width="10%">'.$obj->imp_import.'</td>';
+		print '<td width="10%">'.$obj->ipi.'</td>';
+		print '<td width="10%">'.$obj->pis.'</td>';
+		print '<td width="10%">'.$obj->cofins.'</td>';
+		print '</tr>';
+	}
+	$i++;
+}
+        
 print '</td></tr>';
 print '</table>';
+$db->free($resql);
 dol_fiche_end();
 
 llxFooter();
