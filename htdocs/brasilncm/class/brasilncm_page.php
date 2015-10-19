@@ -70,7 +70,7 @@ $search_cofins=GETPOST('search_cofins','int');
 // Protection if external user
 if ($user->societe_id > 0)
 {
-	//accessforbidden();
+	accessforbidden();
 }
 
 if (empty($action) && empty($id) && empty($ref)) $action='list';

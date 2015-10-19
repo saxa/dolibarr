@@ -40,6 +40,7 @@ print $langs->trans("NcmSetupDesc")."<br>\n";
 
 $fname = array("NCM", "Description", "ImpImport", "IPI", "PIS", "COFINS");
 
+dol_fiche_head();
 // Insert fields form
 print '<form action="" method="POST">';
 print '<table class="noborder" width="100%"><tr class="liste_titre">';
@@ -78,6 +79,7 @@ print '<tr><td width="10%">';
 // Insert loop for listing added values in the database.
 print '</td></tr>';
 print '</table>';
+dol_fiche_end();
 
 llxFooter();
 $db->close();
