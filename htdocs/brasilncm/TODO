@@ -1,4 +1,9 @@
-Versao 0.1
+Version 0.1
 ----------
 Add possibility to insert , edit , delete NCM numbers.
+Add buttons to remove and edit the ncm line in the admin setup.
+Show the NCM tab in the product file which will show the computed taxes values.
+Create a makepack.sh for distribution of the module.
 
+Version 0.2
+-----------
