@@ -1,0 +1,46 @@
+This is the main readme file for brasilncm module.
+This module adds the ability to dolibarr erp to add customs code
+based taxes. In Brasil the taxes of a product are specified by the NCM 
+number wich is used to determine the category of a product.
+
+The aim of this module is to be able to add the 4 main taxes to a
+product in dolibarr ERP so we can later use this to add a tab to the 
+product page where we will show the exact amount of each tax for that
+single product.
+
+INSTALL
+-------
+
+To install this module simply copy the brasilncm directory to the
+htdocs directory of the dolibarr ERP install.
+
+Then go to the admin configuration and enable the module.
+
+That's it.
+
+USAGE
+-----
+
+After installing the module, go to the admin page and add the 
+NCM number , the corresponding taxes into the fields and press
+Add button.
+
+When you entered the needed NCM numbers you have to configure 
+your products by listing the NCM number of that product and 
+in the product NCM tab you should be able to see the values
+of each tax and the correspondant amounts for each tax.
+
+II - Import duty (Imposto de Importacao)
+IPI - Tax on Industrialized Productsi (Imposto sobre Produtos Industrializados)
+PIS - Social Integration Program tax (Programma de Integracao Social)
+COFINS - Social Security Financment Contribution (Contribuicao para o Financiamento da Seguridade Social.
+
+To get the exact values for the NCM number you can do this from many sources.
+One source is http://www4.receita.fazenda.gov.br/simulador
+
+LICENCE
+-------
+
+This module is released under GNU GPLv3 licence.
+
+Written by Sasa Ostrouska <casaxa@gmail.com>
