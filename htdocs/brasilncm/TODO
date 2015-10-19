@@ -1,9 +1,9 @@
 Version 0.1
 ----------
-Add possibility to insert , edit , delete NCM numbers.
-Add buttons to remove and edit the ncm line in the admin setup.
-Show the NCM tab in the product file which will show the computed taxes values.
-Create a makepack.sh for distribution of the module.
+Add possibility to insert , edit , delete NCM numbers. Issue #1
+Add buttons to remove and edit the ncm line in the admin setup. Issue #2
+Show the NCM tab in the product file which will show the computed taxes values. Issue #3
+Create a makepack.sh for distribution of the module. Issue #4
 
 Version 0.2
 -----------
