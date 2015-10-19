@@ -1,4 +1,9 @@
-This is the main readme file for brasilncm module.
+BRASIL NCM MODULE
+-----------------
+
+NCM = Nomenclatura Comum do Mercosul (Common Mercosul Nomenclature) It is 
+based on the first 4 digits of the Harmony System Codes. 
+
 This module adds the ability to dolibarr erp to add customs code
 based taxes. In Brasil the taxes of a product are specified by the NCM 
 number wich is used to determine the category of a product.
