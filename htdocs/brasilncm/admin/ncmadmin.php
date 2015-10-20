@@ -40,7 +40,7 @@ print load_fiche_titre($langs->trans("NCMSetup"),$linkback,'title_setup');
 
 print $langs->trans("NcmSetupDesc")."<br>\n";
 
-$fname = array("NCM", "Description", "ImpImport", "IPI", "PIS", "COFINS");
+$fname = array("NCM", "Desc", "ImpImport", "IPI", "PIS", "COFINS");
 
 dol_fiche_head();
 // Insert fields form
@@ -66,6 +66,37 @@ print '<td align="right"><input type="submit" class="button" name="actionadd" va
 print '</tr>';
 print '</table>';
 print '</form>';
+
+
+if (isset($_POST['actionadd'])) 
+{
+	$customcode = $_POST['NCM'];
+	$text = $_POST['Desc'];
+	$impimport = $_POST['ImpImport'];
+	$ipi = $_POST['IPI'];
+	$pis = $_POST['PIS'];
+	$cofins = $_POST['COFINS'];
+
+	$sql = "INSERT INTO " .MAIN_DB_PREFIX. "brasil_ncm as t";
+	$sql .= " (";
+	$sql .= " t.fk_customcode,";
+	$sql .= " t.ncm_nr,";
+	$sql .= " t.ncm_descr,";
+	$sql .= " t.imp_import,";
+	$sql .= " t.ipi,";
+	$sql .= " t.pis,";
+	$sql .= " t.cofins";
+	$sql .= ") VALUES (";
+	$sql .= $customcode .",";
+	$sql .= "'". $text ."',";
+	$sql .= $impimport.",";
+	$sql .= $ipi.",";
+	$sql .= $pis.",";
+	$sql .= $cofins.");";
+
+	print $sql;
+}
+
 
 // Start searching and getting the values.
 // Create the sql search query
