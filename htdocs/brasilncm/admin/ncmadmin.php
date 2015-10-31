@@ -72,10 +72,10 @@ if (isset($_POST['actionadd']))
 {
 	$customcode = $_POST['NCM'];
 	$text = $_POST['Desc'];
-	$impimport = $_POST['ImpImport'];
-	$ipi = $_POST['IPI'];
-	$pis = $_POST['PIS'];
-	$cofins = $_POST['COFINS'];
+	$impimport = price2num($_POST['ImpImport']);
+	$ipi = price2num($_POST['IPI']);
+	$pis = price2num($_POST['PIS']);
+	$cofins = price2num($_POST['COFINS']);
 
 	$sql = "INSERT INTO " .MAIN_DB_PREFIX. "brasil_ncm as t";
 	$sql .= " (";
@@ -87,8 +87,9 @@ if (isset($_POST['actionadd']))
 	$sql .= " t.pis,";
 	$sql .= " t.cofins";
 	$sql .= ") VALUES (";
+	$sql .= $fkcustcode = $customcode .",";
 	$sql .= $customcode .",";
-	$sql .= "'". $text ."',";
+	$sql .= "''". $text ."'',";
 	$sql .= $impimport.",";
 	$sql .= $ipi.",";
 	$sql .= $pis.",";
