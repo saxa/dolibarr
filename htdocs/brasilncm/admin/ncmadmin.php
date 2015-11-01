@@ -89,7 +89,7 @@ if (isset($_POST['actionadd']))
 	$sql .= ") VALUES (";
 	$sql .= $fkcustcode = $customcode .",";
 	$sql .= $customcode .",";
-	$sql .= "''". $text ."'',";
+	$sql .= "'".$text."',";
 	$sql .= $impimport.",";
 	$sql .= $ipi.",";
 	$sql .= $pis.",";
