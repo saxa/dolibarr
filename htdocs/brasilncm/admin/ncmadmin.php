@@ -167,6 +167,8 @@ print '<th width="10%">'.$langs->trans("$fname[2]").'</th>';
 print '<th width="10%">'.$langs->trans("$fname[3]").'</th>';
 print '<th width="10%">'.$langs->trans("$fname[4]").'</th>';
 print '<th width="10%">'.$langs->trans("$fname[5]").'</th>';
+print '<th></th>';
+print '<th></th>';
 print '</tr>';
 print '<tr><td width="10%">';
 // Insert loop for listing added values in the database.
@@ -184,6 +186,14 @@ while ($i < $num)
 		print '<td width="10%">'.$obj->ipi.'</td>';
 		print '<td width="10%">'.$obj->pis.'</td>';
 		print '<td width="10%">'.$obj->cofins.'</td>';
+		// Modify link
+		$iserasable = 1;
+		if ($iserasable) print '<td align="center"><a href="'.$url.'action=edit#'.(! empty($obj->rowid)?$obj->rowid:(! empty($obj->code)?$obj->code:'')).'">'.img_edit().'</a></td>';
+		else print '<td>&nbsp;</td>';
+		// Delete link
+		if ($iserasable) print '<td align="center"><a href="'.$url.'action=delete">'.img_delete().'</a></td>';
+		else print '<td>&nbsp;</td>';
+                           
 		print '</tr>';
 	}
 	$i++;
