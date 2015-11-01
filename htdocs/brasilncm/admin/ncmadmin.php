@@ -77,15 +77,15 @@ if (isset($_POST['actionadd']))
 	$pis = price2num($_POST['PIS']);
 	$cofins = price2num($_POST['COFINS']);
 
-	$sql = "INSERT INTO " .MAIN_DB_PREFIX. "brasil_ncm as t";
+	$sql = "INSERT INTO " .MAIN_DB_PREFIX. "brasil_ncm";
 	$sql .= " (";
-	$sql .= " t.fk_customcode,";
-	$sql .= " t.ncm_nr,";
-	$sql .= " t.ncm_descr,";
-	$sql .= " t.imp_import,";
-	$sql .= " t.ipi,";
-	$sql .= " t.pis,";
-	$sql .= " t.cofins";
+	$sql .= " fk_customcode,";
+	$sql .= " ncm_nr,";
+	$sql .= " ncm_descr,";
+	$sql .= " imp_import,";
+	$sql .= " ipi,";
+	$sql .= " pis,";
+	$sql .= " cofins";
 	$sql .= ") VALUES (";
 	$sql .= $fkcustcode = $customcode .",";
 	$sql .= $customcode .",";
@@ -95,8 +95,27 @@ if (isset($_POST['actionadd']))
 	$sql .= $pis.",";
 	$sql .= $cofins.");";
 
-	print $sql;
+	dol_syslog("actionadd", LOG_DEBUG);
+	$result = $db->query($sql);
+
+	if ($result)	// Add is ok
+	{
+		setEventMessages($langs->transnoentities("RecordSaved"), null, 'mesgs');
+		$_POST=array('id'=>$id);	// Clean $_POST array, we keep only
+	}
+	else
+	{
+		if ($db->errno() == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
+			setEventMessages($langs->transnoentities("ErrorRecordAlreadyExists"), null, 'errors');
+		}
+		else 
+		{
+			dol_print_error($db);
+		}
+	}
+
 }
+
 
 
 // Start searching and getting the values.
