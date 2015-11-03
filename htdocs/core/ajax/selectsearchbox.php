@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2007-2012 Laurent Destailleur  <eldy@users.sourceforge.net>
+/* Copyright (C) 2015 Laurent Destailleur  <eldy@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -92,20 +92,24 @@ if (! empty($conf->fournisseur->enabled) && empty($conf->global->MAIN_SEARCHFORM
 }
 if (! empty($conf->fournisseur->enabled) && empty($conf->global->MAIN_SEARCHFORM_SUPPLIER_ORDER_DISABLED) && $user->rights->fournisseur->commande->lire)
 {
-	$arrayresult['searchintosupplierorder']=array('text'=>img_picto('','object_propal').' '.$langs->trans("SearchIntoSupplierOrders", $search_boxvalue), 'url'=>DOL_URL_ROOT.'/fourn/commande/list.php?search_all='.urlencode($search_boxvalue));
+	$arrayresult['searchintosupplierorder']=array('text'=>img_picto('','object_order').' '.$langs->trans("SearchIntoSupplierOrders", $search_boxvalue), 'url'=>DOL_URL_ROOT.'/fourn/commande/list.php?search_all='.urlencode($search_boxvalue));
 }
 if (! empty($conf->askpricesupplier->enabled) && empty($conf->global->MAIN_SEARCHFORM_SUPPLIER_PROPAL_DISABLED) && $user->rights->askpricesupplier->lire)
 {
 	$arrayresult['searchintosupplierpropal']=array('text'=>img_picto('','object_propal').' '.$langs->trans("SearchIntoSupplierProposals", $search_boxvalue), 'url'=>DOL_URL_ROOT.'/askpricesupplier/list.php?sall='.urlencode($search_boxvalue));
 }
 
+if (! empty($conf->contrat->enabled) && empty($conf->global->MAIN_SEARCHFORM_CONTRACT_DISABLED) && $user->rights->contrat->lire)
+{
+	$arrayresult['searchintocontract']=array('text'=>img_picto('','object_contract').' '.$langs->trans("SearchIntoContracts", $search_boxvalue), 'url'=>DOL_URL_ROOT.'/contrat/list.php?sall='.urlencode($search_boxvalue));
+}
 if (! empty($conf->ficheinter->enabled) && empty($conf->global->MAIN_SEARCHFORM_FICHINTER_DISABLED) && $user->rights->ficheinter->lire)
 {
 	$arrayresult['searchintointervention']=array('text'=>img_picto('','object_intervention').' '.$langs->trans("SearchIntoInterventions", $search_boxvalue), 'url'=>DOL_URL_ROOT.'/fichinter/list.php?sall='.urlencode($search_boxvalue));
 }
-if (! empty($conf->contrat->enabled) && empty($conf->global->MAIN_SEARCHFORM_CONTRACT_DISABLED) && $user->rights->contrat->lire)
+if (! empty($conf->expensereport->enabled) && empty($conf->global->MAIN_SEARCHFORM_EXPENSEREPORT_DISABLED) && $user->rights->expensereport->lire)
 {
-	$arrayresult['searchintocontract']=array('text'=>img_picto('','object_contract').' '.$langs->trans("SearchIntoContracts", $search_boxvalue), 'url'=>DOL_URL_ROOT.'/contrat/list.php?sall='.urlencode($search_boxvalue));
+	$arrayresult['searchintoexpensereport']=array('text'=>img_picto('','object_trip').' '.$langs->trans("SearchIntoExpenseReports", $search_boxvalue), 'url'=>DOL_URL_ROOT.'/expensereport/list.php?sall='.urlencode($search_boxvalue));
 }
 
 

@@ -1344,10 +1344,10 @@ class Product extends CommonObject
 	 *  @param		int		$level			0=standard, >0 = level if multilevel prices
 	 *  @param     	int		$newnpr         0=Standard vat rate, 1=Special vat rate for French NPR VAT
 	 *  @param     	int		$newpsq         1 if it has price by quantity
-	 * @param int $ignore_autogen Used to avoid infinite loops
+	 *  @param 		int 	$ignore_autogen Used to avoid infinite loops
 	 * 	@return		int						<0 if KO, >0 if OK
 	 */
-	function updatePrice($newprice, $newpricebase, $user, $newvat='',$newminprice='', $level=0, $newnpr=0, $newpsq=0, $ignore_autogen = 0)
+	function updatePrice($newprice, $newpricebase, $user, $newvat='',$newminprice='', $level=0, $newnpr=0, $newpsq=0, $ignore_autogen=0)
 	{
 		global $conf,$langs;
 
@@ -1362,9 +1362,10 @@ class Product extends CommonObject
 		// Check parameters
 		if ($newvat == '') $newvat=$this->tva_tx;
 
-		//If multiprices are enabled, then we check if the current product is subject to price autogeneration
-		//Price will be modified ONLY when the first one is the one that is being modified
-		if (!empty($conf->global->PRODUIT_MULTIPRICES) && !$ignore_autogen && $this->price_autogen && ($level == 1)) {
+		// If multiprices are enabled, then we check if the current product is subject to price autogeneration
+		// Price will be modified ONLY when the first one is the one that is being modified
+		if (!empty($conf->global->PRODUIT_MULTIPRICES) && !$ignore_autogen && $this->price_autogen && ($level == 1)) 
+		{
 			return $this->generateMultiprices($user, $newprice, $newpricebase, $newvat, $newnpr, $newpsq);
 		}
 
@@ -2769,7 +2770,8 @@ class Product extends CommonObject
 					'type'=>$type,				// Nb of units that compose parent product
 					'desiredstock'=>$this->desiredstock,
 					'level'=>$level,
-					'incdec'=>$incdec
+					'incdec'=>$incdec,
+					'entity'=>$this->entity
 				);
 
 				// Recursive call if there is childs to child
@@ -2851,7 +2853,7 @@ class Product extends CommonObject
 	 */
 	function getFather()
 	{
-		$sql = "SELECT p.rowid, p.label as label, p.ref as ref, pa.fk_product_pere as id, p.fk_product_type, pa.qty, pa.incdec";
+		$sql = "SELECT p.rowid, p.label as label, p.ref as ref, pa.fk_product_pere as id, p.fk_product_type, pa.qty, pa.incdec, p.entity";
 		$sql.= " FROM ".MAIN_DB_PREFIX."product_association as pa,";
 		$sql.= " ".MAIN_DB_PREFIX."product as p";
 		$sql.= " WHERE p.rowid = pa.fk_product_pere";
@@ -2869,6 +2871,7 @@ class Product extends CommonObject
 				$prods[$record['id']]['qty'] = $record['qty'];
 				$prods[$record['id']]['incdec'] = $record['incdec'];
 				$prods[$record['id']]['fk_product_type'] =  $record['fk_product_type'];
+				$prods[$record['id']]['entity'] =  $record['entity'];
 			}
 			return $prods;
 		}
@@ -3411,7 +3414,7 @@ class Product extends CommonObject
 
 		$dir = $sdir;
 		if (! empty($conf->global->PRODUCT_USE_OLD_PATH_FOR_PHOTO)) $dir .= '/'. get_exdir($this->id,2,0,0,$this,'product') . $this->id ."/photos";
-		else $dir .= '/'.dol_sanitizeFileName($this->ref);
+		else $dir .= '/'.get_exdir(0,0,0,0,$this,'product').dol_sanitizeFileName($this->ref);
 
 		dol_mkdir($dir);
 
@@ -3449,7 +3452,7 @@ class Product extends CommonObject
 
 		$dir = $sdir;
 		if (! empty($conf->global->PRODUCT_USE_OLD_PATH_FOR_PHOTO)) $dir .= '/'. get_exdir($this->id,2,0,0,$this,'product') . $this->id ."/photos/";
-		else $dir .= '/'.dol_sanitizeFileName($this->ref).'/';
+		else $dir .= '/'.get_exdir(0,0,0,0,$this,'product').dol_sanitizeFileName($this->ref).'/';
 
 		$nbphoto=0;
 
@@ -3500,8 +3503,8 @@ class Product extends CommonObject
 		}
 		else
 		{
-			$dir .= $this->ref.'/';
-			$pdir .= $this->ref.'/';
+			$dir .= get_exdir(0,0,0,0,$this,'product').$this->ref.'/';
+			$pdir .= get_exdir(0,0,0,0,$this,'product').$this->ref.'/';
 		}
 
 		$dirthumb = $dir.'thumbs/';
@@ -4024,6 +4027,7 @@ class Product extends CommonObject
 	{
 		global $conf, $db;
 
+		// FIXME USing * into select is forbidden
 		$sql = "SELECT * FROM ".MAIN_DB_PREFIX."product_pricerules";
 		$query = $db->query($sql);
 
