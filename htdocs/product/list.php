@@ -164,7 +164,7 @@ else
 		$texte = $langs->trans("ProductsAndServices");
 	}
 
-    $sql = 'SELECT DISTINCT p.rowid, p.ref, p.label, p.barcode, p.price, p.price_ttc, p.price_base_type,';
+    $sql = 'SELECT DISTINCT p.rowid, p.ref, p.label, p.barcode, p.price, p.price_ttc, p.price_base_type, p.entity,';
     $sql.= ' p.fk_product_type, p.duration, p.tosell, p.tobuy, p.seuil_stock_alerte, p.desiredstock,';
     $sql.= ' p.datec as date_creation, p.tms as date_update,';
     $sql.= ' MIN(pfp.unitprice) as minsellprice';
@@ -333,7 +333,7 @@ else
     	    if ($sall)
             {
                 foreach($fieldstosearchall as $key => $val) $fieldstosearchall[$key]=$langs->trans($val);
-                print $langs->trans("FilterOnInto", $sall, join(', ',$fieldstosearchall));
+                print $langs->trans("FilterOnInto", $sall) . join(', ',$fieldstosearchall);
             }
             
     		// Filter on categories
@@ -548,8 +548,9 @@ else
     			$product_static->ref = $objp->ref;
                 $product_static->label = $objp->label;
     			$product_static->type = $objp->fk_product_type;
-                $product_static->status_buy = $objp->tobuy;
+    			$product_static->status_buy = $objp->tobuy;
                 $product_static->status     = $objp->tosell;
+				$product_static->entity = $objp->entity;
 
     			$var=!$var;
     			print '<tr '.$bc[$var].'>';

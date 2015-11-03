@@ -179,6 +179,7 @@ function getBrowserInfo($user_agent)
 
 	// OS
 	if (preg_match('/linux/i', $user_agent))	{ $os='linux'; }
+	elseif (preg_match('/macintosh/i', $user_agent))	{ $os='macintosh'; }
 
 	// Name
 	if (preg_match('/firefox(\/|\s)([\d\.]*)/i', $user_agent, $reg))  { $name='firefox';   $version=$reg[2]; }
@@ -703,7 +704,7 @@ function dol_fiche_head($links=array(), $active='0', $title='', $notab=0, $picto
 function dol_get_fiche_head($links=array(), $active='', $title='', $notab=0, $picto='', $pictoisfullpath=0)
 {
 	global $conf,$langs, $hookmanager;
-	
+
 	$out="\n".'<div class="tabs" data-role="controlgroup" data-type="horizontal">'."\n";
 
 	// Show title
@@ -733,7 +734,7 @@ function dol_get_fiche_head($links=array(), $active='', $title='', $notab=0, $pi
 	$displaytab=0;
 	$nbintab=0;
     $popuptab=0;
-    
+
 	for ($i = 0 ; $i <= $maxkey ; $i++)
 	{
 		if ((is_numeric($active) && $i == $active) || (! empty($links[$i][2]) && ! is_numeric($active) && $active == $links[$i][2]))
@@ -777,7 +778,7 @@ function dol_get_fiche_head($links=array(), $active='', $title='', $notab=0, $pi
 		else
 		{
 		    // The popup with the other tabs
-			if (! $popuptab) 
+			if (! $popuptab)
 			{
 			    $popuptab=1;
 			    $outmore.='<div class="popuptabset">';
@@ -795,13 +796,13 @@ function dol_get_fiche_head($links=array(), $active='', $title='', $notab=0, $pi
 				$outmore.='<a'.(! empty($links[$i][2])?' id="'.$links[$i][2].'"':'').' class="inline-block" href="'.$links[$i][0].'">'.$links[$i][1].'</a>'."\n";
 
 			$outmore.='</div>';
-			
+
 			$nbintab++;
 		}
 		$displaytab=$i;
 	}
 	if ($popuptab) $outmore.='</div>';
-	
+
 	if ($displaytab > $limittoshow)
 	{
 		$tabsname=str_replace("@", "", $picto);
@@ -817,7 +818,7 @@ function dol_get_fiche_head($links=array(), $active='', $title='', $notab=0, $pi
 	}
 
 	$out.="</div>\n";
-	
+
 	if (! $notab) $out.="\n".'<div class="tabBar">'."\n";
 
 	$parameters=array('tabname' => $active);
@@ -900,7 +901,7 @@ function dol_banner_tab($object, $paramid, $morehtml='', $shownav=1, $fieldid='r
 	print '</div>';
 	print '<div class="underrefbanner clearboth"></div>';
 }
-   
+
 /**
  * Show a string with the label tag dedicated to the HTML edit field.
  *
@@ -1382,7 +1383,7 @@ function dol_print_size($size,$shortvalue=0,$shortunit=0)
 function dol_print_url($url,$target='_blank',$max=32,$withpicto=0)
 {
 	global $langs;
-	
+
 	if (empty($url)) return '';
 
 	$link='<a href="';
@@ -1675,7 +1676,7 @@ function dol_print_address($address, $htmlid, $mode, $id, $noprint=0)
 	global $conf, $user, $langs, $hookmanager;
 
 	$out = '';
-	
+
 	if ($address)
 	{
         if ($hookmanager) {
@@ -1683,7 +1684,7 @@ function dol_print_address($address, $htmlid, $mode, $id, $noprint=0)
             $reshook = $hookmanager->executeHooks('printAddress', $parameters, $address);
             $out.=$hookmanager->resPrint;
         }
-        if (empty($reshook)) 
+        if (empty($reshook))
         {
             $out.=nl2br($address);
             $showgmap=$showomap=0;
@@ -2748,7 +2749,7 @@ function getTitleFieldOfList($name, $thead=0, $file="", $field="", $begin="", $m
 	$sortorder=strtoupper($sortorder);
 	$out='';
     $sortimg='';
-    
+
 	$tag='th';
 	if ($thead==2) $tag='div';
 
@@ -2815,9 +2816,9 @@ function getTitleFieldOfList($name, $thead=0, $file="", $field="", $begin="", $m
 
 		$sortimg.= '</span>';
 	}
-	
+
 	$out.=$sortimg;
-	
+
 	$out.='</'.$tag.'>';
 
 	return $out;
@@ -2958,7 +2959,7 @@ function print_barre_liste($titre, $page, $file, $options='', $sortfield='', $so
 				if ($cpt > 2) $pagelist.='<li'.(empty($conf->dol_use_jmobile)?' class="pagination"':'').'><span '.(empty($conf->dol_use_jmobile)?'class="inactive"':'data-role="button"').'>...</span></li>';
 				else if ($cpt == 2) $pagelist.='<li'.(empty($conf->dol_use_jmobile)?' class="pagination"':'').'><a '.(empty($conf->dol_use_jmobile)?'':'data-role="button" ').'href="'.$file.'?page=1'.$options.'&amp;sortfield='.$sortfield.'&amp;sortorder='.$sortorder.'">2</a></li>';
 			}
-			
+
 			do
 			{
 				if ($cpt==$page)
@@ -2972,7 +2973,7 @@ function print_barre_liste($titre, $page, $file, $options='', $sortfield='', $so
 				$cpt++;
 			}
 			while ($cpt < $nbpages && $cpt<=$page+$maxnbofpage);
-			
+
 			if ($cpt<$nbpages)
 			{
 				if ($cpt<$nbpages-2) $pagelist.= '<li'.(empty($conf->dol_use_jmobile)?' class="pagination"':'').'><span '.(empty($conf->dol_use_jmobile)?'class="inactive"':'data-role="button"').'>...</span></li>';
@@ -3841,13 +3842,14 @@ function yn($yesno, $case=1, $color=0)
 
 /**
  *	Return a path to have a directory according to object.
- *  Examples:       '001' with level 3->"0/0/1/", '015' with level 3->"0/1/5/"
- *  Examples:       'ABC-1' with level 3 ->"0/0/1/", '015' with level 1->"5/"
+ *  New usage:       $conf->product->multidir_output[$object->entity].'/'.get_exdir(0, 0, 0, 1, $object, 'modulepart')
+ *  Old usage:       '001' with level 3->"0/0/1/", '015' with level 3->"0/1/5/"
+ *  Old usage:       'ABC-1' with level 3 ->"0/0/1/", '015' with level 1->"5/"
  *
- *	@param	string	$num            Id of object
- *	@param  int		$level		    Level of subdirs to return (1, 2 or 3 levels)
- * 	@param	int		$alpha		    0=Keep number only to forge path, 1=Use alpha part afer the - (By default, use 0).
- *  @param  int		$withoutslash   0=With slash at end, 1=without slash at end (except if '/', we return '')
+ *	@param	string	$num            Id of object (deprecated, $object will be used in future)
+ *	@param  int		$level		    Level of subdirs to return (1, 2 or 3 levels). (deprecated, global option will be used in future)
+ * 	@param	int		$alpha		    0=Keep number only to forge path, 1=Use alpha part afer the - (By default, use 0). (deprecated, global option will be used in future)
+ *  @param  int		$withoutslash   0=With slash at end (except if '/', we return ''), 1=without slash at end
  *  @param	Object	$object			Object
  *  @param	string	$modulepart		Type of object ('invoice_supplier, 'donation', 'invoice', ...')
  *  @return	string					Dir to use ending. Example '' or '1/' or '1/2/'
@@ -3857,9 +3859,6 @@ function get_exdir($num,$level,$alpha,$withoutslash,$object,$modulepart)
 	global $conf;
 
 	$path = '';
-
-	// TODO if object is null, load it from id and modulepart.
-
 
 	if (! empty($level) && in_array($modulepart, array('cheque','user','category','holiday','shipment', 'member','don','donation','supplier_invoice','invoice_supplier')))
 	{
@@ -3875,7 +3874,7 @@ function get_exdir($num,$level,$alpha,$withoutslash,$object,$modulepart)
 	{
 		// TODO
 		// We will introduce here a common way of forging path for document storage
-		// Here, $num=id, ref and modulepart are required.
+		// Here, object->id, object->ref and object->modulepart are required.
 
 	}
 
@@ -4402,7 +4401,7 @@ function dolGetFirstLastname($firstname,$lastname,$nameorder=-1)
 	}
 	else if ($nameorder == 2)
 	{
-	   $ret.=$firstname;   
+	   $ret.=$firstname;
 	}
 	else
 	{
@@ -5225,7 +5224,7 @@ function natural_search($fields, $value, $mode=0, $nofirstand=0)
 
 /**
  * Return the filename of file to get the thumbs
- * 
+ *
  * @param   string  $file           Original filename
  * @param   string  $extName        Extension to differenciate thumb file name ('', '_small', '_mini')
  * @param   string  $extImgTarget   Force image format for thumbs. Use '' to keep same extension than original image.
@@ -5235,10 +5234,10 @@ function getImageFileNameForSize($file, $extName, $extImgTarget='')
 {
 	$dirName = dirname($file);
 	if ($dirName == '.') $dirName='';
-	
+
     $fileName = preg_replace('/(\.gif|\.jpeg|\.jpg|\.png|\.bmp)$/i','',$file);	// On enleve extension quelquesoit la casse
 	$fileName = basename($fileName);
-	
+
 	if (empty($extImgTarget)) $extImgTarget = (preg_match('/\.jpg$/i',$file)?'.jpg':'');
     if (empty($extImgTarget)) $extImgTarget = (preg_match('/\.jpeg$/i',$file)?'.jpeg':'');
     if (empty($extImgTarget)) $extImgTarget = (preg_match('/\.gif$/i',$file)?'.gif':'');
@@ -5246,9 +5245,9 @@ function getImageFileNameForSize($file, $extName, $extImgTarget='')
     if (empty($extImgTarget)) $extImgTarget = (preg_match('/\.bmp$/i',$file)?'.bmp':'');
 
     if (! $extImgTarget) return $file;
-	
+
     $subdir='';
     if ($extName) $subdir = 'thumbs/';
-    
+
     return $dirName.$subdir.$fileName.$extName.$extImgTarget; // New filename for thumb
 }
