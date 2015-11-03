@@ -26,6 +26,10 @@ $langs->load("brasilncm");
 
 if (! $user->admin) accessforbidden();
 
+$action = GETPOST('action', 'alpha');
+//$id = GETPOST('id', 'int');
+$rowid = GETPOST('rowid', 'int');
+
 /*
  * View
  */
@@ -67,8 +71,8 @@ print '</tr>';
 print '</table>';
 print '</form>';
 
-
-if (isset($_POST['actionadd'])) 
+// If action is actionadd add the values to the db.
+if ( $action == 'actionadd' ) 
 {
 	$customcode = $_POST['NCM'];
 	$text = $_POST['Desc'];
@@ -116,91 +120,165 @@ if (isset($_POST['actionadd']))
 
 }
 
-
-
-// Start searching and getting the values.
-// Create the sql search query
-$sql = "SELECT";
-$sql .= " t.rowid,";
-$sql .= " t.datec,";
-$sql .= " t.fk_customcode,";
-$sql .= " t.ncm_nr,";
-$sql .= " t.ncm_descr,";
-$sql .= " t.imp_import,";
-$sql .= " t.ipi,";
-$sql .= " t.pis,";
-$sql .= " t.cofins";
-$sql.= " FROM ".MAIN_DB_PREFIX."brasil_ncm as t";
-$sql.= " WHERE 1 = 1";
-// Count total nb of records
-$nbtotalofrecords = 0;
-if (empty($conf->global->MAIN_DISABLE_FULL_SCANLIST))
+// If action is empty then we show what we have.
+if ( $action == '' )
 {
-	$result = $db->query($sql);
-	$nbtotalofrecords = $db->num_rows($result);
-}	
-
-$resql=$db->query($sql);
-if ($resql)
-{
-	$num = $db->num_rows($resql);
-    
-//    	print '<table class="liste">'."\n";
-    
-        // Fields title
-//        print '<tr class="liste_titre">';
-        
-//print_liste_field_titre($langs->trans('ncm_nr'),$_SERVER['PHP_SELF'],'t.ncm_nr','',$param,'width="10%"',$sortfield,$sortorder);
-//print_liste_field_titre($langs->trans('ncm_descr'),$_SERVER['PHP_SELF'],'t.ncm_descr','',$param,'width="50%"',$sortfield,$sortorder);
-//print_liste_field_titre($langs->trans('imp_import'),$_SERVER['PHP_SELF'],'t.imp_import','',$param,'width="10%"',$sortfield,$sortorder);
-//print_liste_field_titre($langs->trans('ipi'),$_SERVER['PHP_SELF'],'t.ipi','',$param,'width="10%"',$sortfield,$sortorder);
-//print_liste_field_titre($langs->trans('pis'),$_SERVER['PHP_SELF'],'t.pis','',$param,'width="10%"',$sortfield,$sortorder);
-//print_liste_field_titre($langs->trans('cofins'),$_SERVER['PHP_SELF'],'t.cofins','',$param,'width="10%"',$sortfield,$sortorder);
-}
-                
-// Start of second table.
-print '<br><br>';
-print '<table class="noborder" width="100%"><tr class="liste_titre">';
-print '<th width="10%">'.$langs->trans("$fname[0]").'</th>';
-print '<th width="50%">'.$langs->trans("$fname[1]").'</th>';
-print '<th width="10%">'.$langs->trans("$fname[2]").'</th>';
-print '<th width="10%">'.$langs->trans("$fname[3]").'</th>';
-print '<th width="10%">'.$langs->trans("$fname[4]").'</th>';
-print '<th width="10%">'.$langs->trans("$fname[5]").'</th>';
-print '<th></th>';
-print '<th></th>';
-print '</tr>';
-print '<tr><td width="10%">';
-// Insert loop for listing added values in the database.
-$i = 0;
-while ($i < $num)
-{
-	$obj = $db->fetch_object($resql);
-	if ($obj)
+	// Start searching and getting the values.
+	// Create the sql search query
+	$sql = "SELECT";
+	$sql .= " t.rowid,";
+	$sql .= " t.datec,";
+	$sql .= " t.fk_customcode,";
+	$sql .= " t.ncm_nr,";
+	$sql .= " t.ncm_descr,";
+	$sql .= " t.imp_import,";
+	$sql .= " t.ipi,";
+	$sql .= " t.pis,";
+	$sql .= " t.cofins";
+	$sql.= " FROM ".MAIN_DB_PREFIX."brasil_ncm as t";
+	$sql.= " WHERE 1 = 1";
+	// Count total nb of records
+	$nbtotalofrecords = 0;
+	if (empty($conf->global->MAIN_DISABLE_FULL_SCANLIST))
 	{
-		// You can use here results
-		print '<tr>';
-		print '<td width="10%">'.$obj->ncm_nr.'</td>';
-		print '<td width="50%">'.$obj->ncm_descr.'</td>';
-		print '<td width="10%">'.$obj->imp_import.'</td>';
-		print '<td width="10%">'.$obj->ipi.'</td>';
-		print '<td width="10%">'.$obj->pis.'</td>';
-		print '<td width="10%">'.$obj->cofins.'</td>';
-		// Modify link
-		$iserasable = 1;
-		if ($iserasable) print '<td align="center"><a href="'.$url.'action=edit#'.(! empty($obj->rowid)?$obj->rowid:(! empty($obj->code)?$obj->code:'')).'">'.img_edit().'</a></td>';
-		else print '<td>&nbsp;</td>';
-		// Delete link
-		if ($iserasable) print '<td align="center"><a href="'.$url.'action=delete">'.img_delete().'</a></td>';
-		else print '<td>&nbsp;</td>';
-                           
-		print '</tr>';
-	}
-	$i++;
-}
+		$result = $db->query($sql);
+		$nbtotalofrecords = $db->num_rows($result);
+	}	
+
+	$resql=$db->query($sql);
+	if ($resql)
+	{
+		$num = $db->num_rows($resql);
+    
+		//    	print '<table class="liste">'."\n";
+    
+	        // Fields title
+		//        print '<tr class="liste_titre">';
         
+		//print_liste_field_titre($langs->trans('ncm_nr'),$_SERVER['PHP_SELF'],'t.ncm_nr','',$param,'width="10%"',$sortfield,$sortorder);
+		//print_liste_field_titre($langs->trans('ncm_descr'),$_SERVER['PHP_SELF'],'t.ncm_descr','',$param,'width="50%"',$sortfield,$sortorder);
+		//print_liste_field_titre($langs->trans('imp_import'),$_SERVER['PHP_SELF'],'t.imp_import','',$param,'width="10%"',$sortfield,$sortorder);
+		//print_liste_field_titre($langs->trans('ipi'),$_SERVER['PHP_SELF'],'t.ipi','',$param,'width="10%"',$sortfield,$sortorder);
+		//print_liste_field_titre($langs->trans('pis'),$_SERVER['PHP_SELF'],'t.pis','',$param,'width="10%"',$sortfield,$sortorder);
+		//print_liste_field_titre($langs->trans('cofins'),$_SERVER['PHP_SELF'],'t.cofins','',$param,'width="10%"',$sortfield,$sortorder);
+	}
+                
+	// Start of second table.
+	print '<br><br>';
+	print '<table class="noborder" width="100%"><tr class="liste_titre">';
+	print '<th width="10%">'.$langs->trans("$fname[0]").'</th>';
+	print '<th width="50%">'.$langs->trans("$fname[1]").'</th>';
+	print '<th width="10%">'.$langs->trans("$fname[2]").'</th>';
+	print '<th width="10%">'.$langs->trans("$fname[3]").'</th>';
+	print '<th width="10%">'.$langs->trans("$fname[4]").'</th>';
+	print '<th width="10%">'.$langs->trans("$fname[5]").'</th>';
+	print '<th></th>';
+	print '<th></th>';
+	print '</tr>';
+	print '<tr><td width="10%">';
+	// Insert loop for listing added values in the database.
+	$i = 0;
+	//$url = $_SERVER["PHP_SELF"].'?'.($page?'page='.$page.'&':'').'sortfield='.$sortfield.'&sortorder='.$sortorder.'&rowid='.(! empty($obj->rowid)?$obj->rowid:(! empty($obj->code)?$obj->code:'')).'&amp;code='.(! empty($obj->code)?urlencode($obj->code):'').'&amp;id='.$id.'&amp;';
+	$url = $_SERVER["PHP_SELF"].'?'.($action);
+
+	while ($i < $num)
+	{
+		$obj = $db->fetch_object($resql);
+		if ($obj)
+		{
+			// You can use here results
+			print '<tr>';
+			print '<td width="10%">'.$obj->ncm_nr.'</td>';
+			print '<td width="50%">'.$obj->ncm_descr.'</td>';
+			print '<td width="10%">'.$obj->imp_import.'</td>';
+			print '<td width="10%">'.$obj->ipi.'</td>';
+			print '<td width="10%">'.$obj->pis.'</td>';
+			print '<td width="10%">'.$obj->cofins.'</td>';
+			// Modify link
+			$iserasable = 1;
+			if ($iserasable) print '<td align="center"><a href="'.$url.'action=edit#'.(! empty($obj->rowid)?$obj->rowid:(! empty($obj->code)?$obj->code:'')).'">'.img_edit().'</a></td>';
+			else print '<td>&nbsp;</td>';
+			// Delete link
+			if ($iserasable) print '<td align="center"><a href="'.$url.'action=delete">'.img_delete().'</a></td>';
+			else print '<td>&nbsp;</td>';
+                           
+			print '</tr>';
+		}
+	$i++;
+	}
+}
+
+//if ( $action == 'delete' && $rowid != '' ) //&& $confirm == 'yes')       // delete
+//{
+	// if ($tabrowid[$id]) { 
+	//	$rowidcol=$tabrowid[$id]; 
+	//}
+	//else 
+	//{ 
+//	$rowidcol = $rowid; 
+	//}
+//	$sql = "DELETE from " .MAIN_DB_PREFIX. "brasil_ncm WHERE ".$rowidcol."='".$rowid."'";
+//	print $sql
+	// Start of second table.
+//	print '<br><br>';
+//	print '<table class="noborder" width="100%"><tr class="liste_titre">';
+//	print '<th width="10%">'.$langs->trans("$fname[0]").'</th>';
+//	print '<th width="50%">'.$langs->trans("$fname[1]").'</th>';
+//	print '<th width="10%">'.$langs->trans("$fname[2]").'</th>';
+//	print '<th width="10%">'.$langs->trans("$fname[3]").'</th>';
+//	print '<th width="10%">'.$langs->trans("$fname[4]").'</th>';
+//	print '<th width="10%">'.$langs->trans("$fname[5]").'</th>';
+//	print '<th></th>';
+//	print '<th></th>';
+//	print '</tr>';
+//	print '<tr><td width="10%">';
+//	// Insert loop for listing added values in the database.
+//	$i = 0;
+//	while ($i < $num)
+//	{
+//		$obj = $db->fetch_object($resql);
+//		if ($obj)
+//		{
+//			// You can use here results
+//			print '<tr>';
+//			print '<td width="10%">'.$obj->ncm_nr.'</td>';
+//			print '<td width="50%">'.$obj->ncm_descr.'</td>';
+//			print '<td width="10%">'.$obj->imp_import.'</td>';
+//			print '<td width="10%">'.$obj->ipi.'</td>';
+//			print '<td width="10%">'.$obj->pis.'</td>';
+//			print '<td width="10%">'.$obj->cofins.'</td>';
+//			// Modify link
+//			$iserasable = 1;
+//			if ($iserasable) print '<td align="center"><a href="'.$url.'action=edit#'.(! empty($obj->rowid)?$obj->rowid:(! empty($obj->code)?$obj->code:'')).'">'.img_edit().'</a></td>';
+//			else print '<td>&nbsp;</td>';
+//			// Delete link
+//			if ($iserasable) print '<td align="center"><a href="'.$url.'action=delete">'.img_delete().'</a></td>';
+//			else print '<td>&nbsp;</td>';
+//                         
+//			print '</tr>';
+//		}
+//	$i++;
+//	}
+//	// dol_syslog("delete", LOG_DEBUG);
+//	// $result = $db->query($sql);
+//	//if (! $result)
+//	//{
+//	//	if ($db->errno() == 'DB_ERROR_CHILD_EXISTS')
+//	//	{
+//	//		setEventMessages($langs->transnoentities("ErrorRecordIsUsedByChild"), null, 'errors');
+	//	}
+	//	else
+	//	{
+	//		dol_print_error($db);
+	//	}
+	//}
+
+//}
+
 print '</td></tr>';
 print '</table>';
+
+
 $db->free($resql);
 dol_fiche_end();
 
