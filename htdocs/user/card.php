@@ -92,7 +92,7 @@ $extrafields = new ExtraFields($db);
 // fetch optionals attributes and labels
 $extralabels=$extrafields->fetch_name_optionals_label($object->table_element);
 
-// Initialize technical object to manage hooks of thirdparties. Note that conf->hooks_modules contains array array
+// Initialize technical object to manage hooks. Note that conf->hooks_modules contains array
 $hookmanager->initHooks(array('usercard','globalcard'));
 
 
@@ -1156,7 +1156,9 @@ else
         {
 			dol_fiche_head($head, 'user', $title, 0, 'user');
 
-	        dol_banner_tab($object,'id','',$user->rights->user->user->lire || $user->admin);
+            $linkback = '<a href="'.DOL_URL_ROOT.'/user/index.php">'.$langs->trans("BackToList").'</a>';
+			
+	        dol_banner_tab($object,'id',$linkback,$user->rights->user->user->lire || $user->admin);
 
 
 	        print '<div class="fichecenter">';
