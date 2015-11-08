@@ -27,7 +27,7 @@ $langs->load("brasilncm");
 if (! $user->admin) accessforbidden();
 
 $action = GETPOST('action', 'alpha');
-//$id = GETPOST('id', 'int');
+$confirm = GETPOST('confirm', 'alpha');
 $rowid = GETPOST('rowid', 'int');
 
 /*
@@ -199,7 +199,7 @@ if ( $action == '' )
 			if ($iserasable) print '<td align="center"><a href="'.$url.'action=edit#'.(! empty($obj->rowid)?$obj->rowid:(! empty($obj->code)?$obj->code:'')).'">'.img_edit().'</a></td>';
 			else print '<td>&nbsp;</td>';
 			// Delete link
-			if ($iserasable) print '<td align="center"><a href="'.$url.'action=delete">'.img_delete().'</a></td>';
+			if ($iserasable) print '<td align="center"><a href="'.$url.'action=delete&rowid='.(! empty($obj->rowid)?$obj->rowid:$obj->rowid).'">'.img_delete().'</a></td>';
 			else print '<td>&nbsp;</td>';
                            
 			print '</tr>';
@@ -208,46 +208,45 @@ if ( $action == '' )
 	}
 }
 
-//if ( $action == 'delete' && $rowid != '' ) //&& $confirm == 'yes')       // delete
-//{
-	// if ($tabrowid[$id]) { 
-	//	$rowidcol=$tabrowid[$id]; 
-	//}
-	//else 
-	//{ 
-//	$rowidcol = $rowid; 
-	//}
-//	$sql = "DELETE from " .MAIN_DB_PREFIX. "brasil_ncm WHERE ".$rowidcol."='".$rowid."'";
-//	print $sql
+// Show confirmation dialog.
+if ($action == 'delete')
+{
+	    print $form->formconfirm($_SERVER["PHP_SELF"].'?rowid='.$rowid, $langs->trans('DeleteLine'), $langs->trans('ConfirmDeleteLine'), 'confirm_delete','',0,1);
+}
+
+if ( $action == 'confirm_delete' && $confirm == 'yes' )
+{
+	$sql = "DELETE from " .MAIN_DB_PREFIX. "brasil_ncm WHERE rowid="."'".$rowid."'";
+	print $sql;
 	// Start of second table.
-//	print '<br><br>';
-//	print '<table class="noborder" width="100%"><tr class="liste_titre">';
-//	print '<th width="10%">'.$langs->trans("$fname[0]").'</th>';
-//	print '<th width="50%">'.$langs->trans("$fname[1]").'</th>';
-//	print '<th width="10%">'.$langs->trans("$fname[2]").'</th>';
-//	print '<th width="10%">'.$langs->trans("$fname[3]").'</th>';
-//	print '<th width="10%">'.$langs->trans("$fname[4]").'</th>';
-//	print '<th width="10%">'.$langs->trans("$fname[5]").'</th>';
-//	print '<th></th>';
-//	print '<th></th>';
-//	print '</tr>';
-//	print '<tr><td width="10%">';
-//	// Insert loop for listing added values in the database.
-//	$i = 0;
-//	while ($i < $num)
-//	{
-//		$obj = $db->fetch_object($resql);
-//		if ($obj)
-//		{
-//			// You can use here results
-//			print '<tr>';
-//			print '<td width="10%">'.$obj->ncm_nr.'</td>';
-//			print '<td width="50%">'.$obj->ncm_descr.'</td>';
-//			print '<td width="10%">'.$obj->imp_import.'</td>';
-//			print '<td width="10%">'.$obj->ipi.'</td>';
-//			print '<td width="10%">'.$obj->pis.'</td>';
-//			print '<td width="10%">'.$obj->cofins.'</td>';
-//			// Modify link
+	print '<br><br>';
+	print '<table class="noborder" width="100%"><tr class="liste_titre">';
+	print '<th width="10%">'.$langs->trans("$fname[0]").'</th>';
+	print '<th width="50%">'.$langs->trans("$fname[1]").'</th>';
+	print '<th width="10%">'.$langs->trans("$fname[2]").'</th>';
+	print '<th width="10%">'.$langs->trans("$fname[3]").'</th>';
+	print '<th width="10%">'.$langs->trans("$fname[4]").'</th>';
+	print '<th width="10%">'.$langs->trans("$fname[5]").'</th>';
+	print '<th></th>';
+	print '<th></th>';
+	print '</tr>';
+	print '<tr><td width="10%">';
+	// Insert loop for listing added values in the database.
+	$i = 0;
+	while ($i < $num)
+	{
+		$obj = $db->fetch_object($resql);
+		if ($obj)
+		{
+			// You can use here results
+			print '<tr>';
+			print '<td width="10%">'.$obj->ncm_nr.'</td>';
+			print '<td width="50%">'.$obj->ncm_descr.'</td>';
+			print '<td width="10%">'.$obj->imp_import.'</td>';
+			print '<td width="10%">'.$obj->ipi.'</td>';
+			print '<td width="10%">'.$obj->pis.'</td>';
+			print '<td width="10%">'.$obj->cofins.'</td>';
+			// Modify link
 //			$iserasable = 1;
 //			if ($iserasable) print '<td align="center"><a href="'.$url.'action=edit#'.(! empty($obj->rowid)?$obj->rowid:(! empty($obj->code)?$obj->code:'')).'">'.img_edit().'</a></td>';
 //			else print '<td>&nbsp;</td>';
@@ -255,25 +254,25 @@ if ( $action == '' )
 //			if ($iserasable) print '<td align="center"><a href="'.$url.'action=delete">'.img_delete().'</a></td>';
 //			else print '<td>&nbsp;</td>';
 //                         
-//			print '</tr>';
-//		}
-//	$i++;
-//	}
-//	// dol_syslog("delete", LOG_DEBUG);
-//	// $result = $db->query($sql);
-//	//if (! $result)
-//	//{
-//	//	if ($db->errno() == 'DB_ERROR_CHILD_EXISTS')
-//	//	{
-//	//		setEventMessages($langs->transnoentities("ErrorRecordIsUsedByChild"), null, 'errors');
-	//	}
-	//	else
-	//	{
-	//		dol_print_error($db);
-	//	}
-	//}
+			print '</tr>';
+		}
+	$i++;
+	}
+	dol_syslog("delete", LOG_DEBUG);
+	$result = $db->query($sql);
+	if (! $result)
+	{
+		if ($db->errno() == 'DB_ERROR_CHILD_EXISTS')
+		{
+			setEventMessages($langs->transnoentities("ErrorRecordIsUsedByChild"), null, 'errors');
+		}
+		else
+		{
+			dol_print_error($db);
+		}
+	}
 
-//}
+}
 
 print '</td></tr>';
 print '</table>';
