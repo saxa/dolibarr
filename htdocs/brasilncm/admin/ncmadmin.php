@@ -136,7 +136,8 @@ if ( $action == '' )
 	$sql .= " t.pis,";
 	$sql .= " t.cofins";
 	$sql.= " FROM ".MAIN_DB_PREFIX."brasil_ncm as t";
-	$sql.= " WHERE 1 = 1";
+	// $sql.= " WHERE 1 = 1"; This is not needed at all, at least right now.
+
 	// Count total nb of records
 	$nbtotalofrecords = 0;
 	if (empty($conf->global->MAIN_DISABLE_FULL_SCANLIST))
