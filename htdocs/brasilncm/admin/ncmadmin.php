@@ -72,7 +72,7 @@ print '</table>';
 print '</form>';
 
 // If action is actionadd add the values to the db.
-if ( $action == 'actionadd' ) 
+if (GETPOST('actionadd'))
 {
 	$customcode = $_POST['NCM'];
 	$text = $_POST['Desc'];
