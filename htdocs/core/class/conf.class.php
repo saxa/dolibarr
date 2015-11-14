@@ -418,7 +418,8 @@ class Conf
 		// conf->mailing->email_from = email pour envoi par Dolibarr des mailings
 		$this->mailing->email_from=$this->email_from;
 		if (! empty($this->global->MAILING_EMAIL_FROM))	$this->mailing->email_from=$this->global->MAILING_EMAIL_FROM;
-
+		if (! isset($conf->global->MAIN_EMAIL_ADD_TRACK_ID)) $conf->global->MAIN_EMAIL_ADD_TRACK_ID=1;
+		
         // Format for date (used by default when not found or not searched in lang)
         $this->format_date_short="%d/%m/%Y";            // Format of day with PHP/C tags (strftime functions)
         $this->format_date_short_java="dd/MM/yyyy";     // Format of day with Java tags
@@ -453,7 +454,7 @@ class Conf
 		if (! isset($this->global->MAIN_MODULES_FOR_EXTERNAL)) $this->global->MAIN_MODULES_FOR_EXTERNAL='user,askpricesupplier,facture,categorie,commande,fournisseur,contact,propal,projet,contrat,societe,ficheinter,expedition,agenda,adherent';	// '' means 'all'. Note that contact is added here as it should be a module later.
 
 		// Enable select2
-		if (empty($this->global->MAIN_USE_JQUERY_MULTISELECT)) $this->global->MAIN_USE_JQUERY_MULTISELECT='select2';
+		if (empty($this->global->MAIN_USE_JQUERY_MULTISELECT) || $this->global->MAIN_USE_JQUERY_MULTISELECT == '1') $this->global->MAIN_USE_JQUERY_MULTISELECT='select2';
 
 		// Timeouts
         if (empty($this->global->MAIN_USE_CONNECT_TIMEOUT)) $this->global->MAIN_USE_CONNECT_TIMEOUT=10;

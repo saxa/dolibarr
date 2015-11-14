@@ -32,6 +32,8 @@ INSERT INTO llx_const (name, value, type, note, visible) values ('MAIN_SIZE_SHOR
 
 ALTER TABLE llx_accounting_system MODIFY COLUMN pcg_version varchar(32);
 ALTER TABLE llx_accountingaccount MODIFY COLUMN fk_pcg_version varchar(32);
+ALTER TABLE llx_accountingaccount RENAME TO llx_accounting_account;
+ALTER TABLE llx_accounting_account ADD INDEX idx_accounting_account_account_number (account_number);
 
 UPDATE llx_const SET name = __ENCRYPT('ACCOUNTING_EXPORT_PREFIX_SPEC')__ WHERE __DECRYPT('name')__ = 'EXPORT_PREFIX_SPEC';
 
@@ -39,8 +41,6 @@ UPDATE llx_const set value = __ENCRYPT('eldy')__ WHERE __DECRYPT('value')__ = 'a
 UPDATE llx_const set value = __ENCRYPT('eldy')__ WHERE __DECRYPT('value')__ = 'bureau2crea';
 UPDATE llx_const set value = __ENCRYPT('eldy')__ WHERE __DECRYPT('value')__ = 'amarok';
 UPDATE llx_const set value = __ENCRYPT('eldy')__ WHERE __DECRYPT('value')__ = 'cameleo';
-
-ALTER TABLE llx_accountingaccount RENAME TO llx_accounting_account;
 
 ALTER TABLE llx_societe ADD COLUMN model_pdf varchar(255);
 
@@ -111,7 +111,8 @@ ALTER TABLE llx_ecm_files ADD UNIQUE INDEX uk_ecm_files (label, entity);
 ALTER TABLE llx_product ADD COLUMN onportal smallint DEFAULT 0 AFTER tobuy;
 
 
-ALTER TABLE llx_user ADD COLUMN employee smallint DEFAULT 1;
+ALTER TABLE llx_user ADD COLUMN employee smallint DEFAULT 1 AFTER ref_int;
+ALTER TABLE llx_user ADD COLUMN fk_establishment integer DEFAULT 0 AFTER employee;
 
 
 CREATE TABLE IF NOT EXISTS llx_c_hrm_function

@@ -31,7 +31,7 @@ if (! defined('NOREQUIRESOC'))    define('NOREQUIRESOC','1');
 if (! defined('NOCSRFCHECK'))     define('NOCSRFCHECK',1);
 if (! defined('NOTOKENRENEWAL'))  define('NOTOKENRENEWAL',1);
 if (! defined('NOLOGIN'))         define('NOLOGIN',1);          // File must be accessed by logon page so without login
-if (! defined('NOREQUIREMENU'))   define('NOREQUIREMENU',1);
+//if (! defined('NOREQUIREMENU'))   define('NOREQUIREMENU',1);  // We need top menu content
 if (! defined('NOREQUIREHTML'))   define('NOREQUIREHTML',1);
 if (! defined('NOREQUIREAJAX'))   define('NOREQUIREAJAX','1');
 
@@ -214,6 +214,11 @@ print 'dol_screenheight='.$_SESSION['dol_screenheight']."\n";
 print '*/'."\n";
 
 if (! empty($conf->dol_optimize_smallscreen)) $fontsize=11;
+
+
+//$nb=$menumanager->showmenu('topnb');
+//print $nb;
+
 ?>
 
 /* ============================================================================== */
@@ -227,7 +232,7 @@ body {
 <?php } else { ?>
 	background: rgb(<?php print $colorbackbody; ?>);
 <?php } ?>
-	color: #101010;
+	color: rgb(<?php echo $colortext; ?>);
 	font-size: <?php print $fontsize ?>px;
 	font-family: <?php print $fontlist ?>;
     margin-top: 0;
@@ -503,6 +508,7 @@ div.confirmmessage {
 .minwidth200 { min-width: 200px; }
 .minwidth300 { min-width: 300px; }
 .maxwidth100 { max-width: 100px; }
+.maxwidth150 { max-width: 150px; }
 .maxwidth200 { max-width: 200px; }
 .maxwidth300 { max-width: 300px; }
 .titlefield { width: 30%; }
@@ -3590,6 +3596,9 @@ a span.select2-chosen
   overflow: hidden;
 }
 
+.noborderoncategories {
+	border: none !important;
+}
 
 /* ============================================================================== */
 /*  Multiselect with checkbox                                                     */
