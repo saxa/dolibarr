@@ -198,7 +198,7 @@ if ( $action == '' )
 			// Modify link
 			$iserasable = 1;
 			if ($iserasable)
-				print '<td align="center"><a href="'.$url.'action=edit&rowid='.(! empty($obj->rowid)?$obj->rowid:$obj->rowid).'">'.img_edit().'</a></td>';
+				print '<td align="center"><a href="'.$url.'action=modify&rowid='.(! empty($obj->rowid)?$obj->rowid:$obj->rowid).'">'.img_edit().'</a></td>';
 			else 
 				print '<td>&nbsp;</td>';
 			// Delete link
@@ -214,10 +214,9 @@ if ( $action == '' )
 }
 
 // Edit the line.
-if ($action == 'edit')
+if ($action == 'modify')
 {
-	$sql = "UPDATE " .MAIN_DB_PREFIX. "brasil_ncm ";
-	$sql .= "SET ";
+	$sql = "UPDATE " .MAIN_DB_PREFIX. "brasil_ncm SET ";
 	$sql .=	"WHERE rowid="."'".$rowid."'";
 	print $sql;
 	// Start of second table.
