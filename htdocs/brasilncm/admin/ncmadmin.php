@@ -213,6 +213,13 @@ if ( $action == '' )
 	}
 }
 
+// Edit the line.
+if ($action == 'edit')
+{
+
+}
+
+
 // Show confirmation dialog.
 if ($action == 'delete')
 {
