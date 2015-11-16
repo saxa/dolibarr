@@ -197,11 +197,15 @@ if ( $action == '' )
 			print '<td width="10%">'.$obj->cofins.'</td>';
 			// Modify link
 			$iserasable = 1;
-			if ($iserasable) print '<td align="center"><a href="'.$url.'action=edit#'.(! empty($obj->rowid)?$obj->rowid:(! empty($obj->code)?$obj->code:'')).'">'.img_edit().'</a></td>';
-			else print '<td>&nbsp;</td>';
+			if ($iserasable)
+				print '<td align="center"><a href="'.$url.'action=edit&rowid='.(! empty($obj->rowid)?$obj->rowid:$obj->rowid).'">'.img_edit().'</a></td>';
+			else 
+				print '<td>&nbsp;</td>';
 			// Delete link
-			if ($iserasable) print '<td align="center"><a href="'.$url.'action=delete&rowid='.(! empty($obj->rowid)?$obj->rowid:$obj->rowid).'">'.img_delete().'</a></td>';
-			else print '<td>&nbsp;</td>';
+			if ($iserasable) 
+				print '<td align="center"><a href="'.$url.'action=delete&rowid='.(! empty($obj->rowid)?$obj->rowid:$obj->rowid).'">'.img_delete().'</a></td>';
+			else 
+				print '<td>&nbsp;</td>';
                            
 			print '</tr>';
 		}
@@ -247,14 +251,6 @@ if ( $action == 'confirm_delete' && $confirm == 'yes' )
 			print '<td width="10%">'.$obj->ipi.'</td>';
 			print '<td width="10%">'.$obj->pis.'</td>';
 			print '<td width="10%">'.$obj->cofins.'</td>';
-			// Modify link
-//			$iserasable = 1;
-//			if ($iserasable) print '<td align="center"><a href="'.$url.'action=edit#'.(! empty($obj->rowid)?$obj->rowid:(! empty($obj->code)?$obj->code:'')).'">'.img_edit().'</a></td>';
-//			else print '<td>&nbsp;</td>';
-//			// Delete link
-//			if ($iserasable) print '<td align="center"><a href="'.$url.'action=delete">'.img_delete().'</a></td>';
-//			else print '<td>&nbsp;</td>';
-//                         
 			print '</tr>';
 		}
 	$i++;
