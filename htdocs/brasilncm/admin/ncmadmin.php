@@ -216,6 +216,23 @@ if ( $action == '' )
 // Edit the line.
 if ($action == 'edit')
 {
+	$sql = "UPDATE " .MAIN_DB_PREFIX. "brasil_ncm ";
+	$sql .= "SET ";
+	$sql .=	"WHERE rowid="."'".$rowid."'";
+	print $sql;
+	// Start of second table.
+	print '<br><br>';
+	print '<table class="noborder" width="100%"><tr class="liste_titre">';
+	print '<th width="10%">'.$langs->trans("$fname[0]").'</th>';
+	print '<th width="50%">'.$langs->trans("$fname[1]").'</th>';
+	print '<th width="10%">'.$langs->trans("$fname[2]").'</th>';
+	print '<th width="10%">'.$langs->trans("$fname[3]").'</th>';
+	print '<th width="10%">'.$langs->trans("$fname[4]").'</th>';
+	print '<th width="10%">'.$langs->trans("$fname[5]").'</th>';
+	print '<th></th>';
+	print '<th></th>';
+	print '</tr>';
+	print '<tr><td width="10%">';
 
 }
 
