@@ -590,13 +590,13 @@ if ($resql)
 		$formmail->withtoreadonly=1;
 		$formmail->withtocc=1;
 		$formmail->withtoccc=$conf->global->MAIN_EMAIL_USECCC;
-		$formmail->withtopic=$langs->transnoentities($topicmail, '__FACREF__', '__REFCLIENT__');
+		$formmail->withtopic=$langs->transnoentities($topicmail, '__REF__', '__REFCLIENT__');
 		$formmail->withfile=$langs->trans("EachInvoiceWillBeAttachedToEmail");
 		$formmail->withbody=1;
 		$formmail->withdeliveryreceipt=1;
 		$formmail->withcancel=1;
 		// Tableau des substitutions
-		//$formmail->substit['__FACREF__']='';
+		//$formmail->substit['__REF__']='';
 		$formmail->substit['__SIGNATURE__']=$user->signature;
 		//$formmail->substit['__REFCLIENT__']='';
 		$formmail->substit['__PERSONALIZED__']='';
@@ -637,7 +637,7 @@ if ($resql)
  		$langs->load("commercial");
  		$moreforfilter.='<div class="divsearchfield">';
  		$moreforfilter.=$langs->trans('ThirdPartiesOfSaleRepresentative'). ': ';
-		$moreforfilter.=$formother->select_salesrepresentatives($search_sale,'search_sale',$user);
+		$moreforfilter.=$formother->select_salesrepresentatives($search_sale,'search_sale',$user, 0, 1, 'maxwidth300');
 	 	$moreforfilter.='</div>';
  	}
     // If the user can view prospects other than his'
@@ -645,7 +645,7 @@ if ($resql)
     {
         $moreforfilter.='<div class="divsearchfield">';
         $moreforfilter.=$langs->trans('LinkedToSpecificUsers'). ': ';
-        $moreforfilter.=$form->select_dolusers($search_user,'search_user',1);
+        $moreforfilter.=$form->select_dolusers($search_user, 'search_user', 1, '', 0, '', '', 0, 0, 0, '', 0, '', 'maxwidth300');
         $moreforfilter.='</div>';
     }
     if (! empty($moreforfilter))

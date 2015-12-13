@@ -1503,7 +1503,6 @@ class ExpenseReport extends CommonObject
             $this->error=$this->db->error();
             return -1;
         }
-
     }
 
     /**
@@ -1591,7 +1590,7 @@ class ExpenseReportLine
      *
      * @param DoliDB    $db     Handlet database
      */
-    function ExpenseReportLine($db)
+    function __construct($db)
     {
         $this->db= $db;
     }
