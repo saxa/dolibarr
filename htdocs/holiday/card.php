@@ -618,7 +618,7 @@ if ($action == 'confirm_cancel' && GETPOST('confirm') == 'yes')
 
             // From
             $expediteur = new User($db);
-            $expediteur->fetch($cp->fk_validator);
+            $expediteur->fetch($cp->fk_user_cancel);
             $emailFrom = $expediteur->email;
 
             // Subject
@@ -763,7 +763,7 @@ if (empty($id) || $action == 'add' || $action == 'request' || $action == 'create
         dol_fiche_head();
 
         $out='';
-        $typeleaves=$cp->getTypes(1,-1);
+        $typeleaves=$cp->getTypes(1,1);
     	foreach($typeleaves as $key => $val)
 		{
 			$nb_type = $cp->getCPforUser($user->id, $val['rowid']);

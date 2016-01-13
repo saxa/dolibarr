@@ -222,10 +222,7 @@ else
 	// multilang
 	if (! empty($conf->global->MAIN_MULTILANGS)) $sql.= " LEFT JOIN ".MAIN_DB_PREFIX."product_lang as pl ON pl.fk_product = p.rowid AND pl.lang = '".$langs->getDefaultLang() ."'";
 	$sql.= ' WHERE p.entity IN ('.getEntity('product', 1).')';
-	if ($sall)
-	{
-		$sql .= natural_search(array_keys($fieldstosearchall), $sall);
-	}
+	if ($sall) $sql .= natural_search(array_keys($fieldstosearchall), $sall);
     // if the type is not 1, we show all products (type = 0,2,3)
     if (dol_strlen($type))
     {
@@ -233,7 +230,8 @@ else
     	else $sql.= " AND p.fk_product_type <> '1'";
     }
 	if ($sref)     $sql .= natural_search('p.ref', $sref);
-    if ($sbarcode) $sql .= natural_search('p.barcode', $sbarcode);
+	if ($snom)     $sql .= natural_search('p.label', $snom);
+	if ($sbarcode) $sql .= natural_search('p.barcode', $sbarcode);
     if (isset($tosell) && dol_strlen($tosell) > 0  && $tosell!=-1) $sql.= " AND p.tosell = ".$db->escape($tosell);
     if (isset($tobuy) && dol_strlen($tobuy) > 0  && $tobuy!=-1)   $sql.= " AND p.tobuy = ".$db->escape($tobuy);
     if (dol_strlen($canvas) > 0)                    $sql.= " AND p.canvas = '".$db->escape($canvas)."'";

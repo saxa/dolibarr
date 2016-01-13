@@ -33,7 +33,9 @@ class Holiday extends CommonObject
 {
 	public $element='holiday';
 	public $table_element='holiday';
-
+	protected $isnolinkedbythird = 1;     // No field fk_soc
+	protected $ismultientitymanaged = 0;	// 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
+	
 	/**
 	 * @deprecated
 	 * @see id
@@ -211,7 +213,8 @@ class Holiday extends CommonObject
         $sql.= " cp.note_private,";
         $sql.= " cp.note_public,";
         $sql.= " cp.fk_user_create,";
-        $sql.= " cp.fk_type";
+        $sql.= " cp.fk_type,";
+        $sql.= " cp.entity";
         $sql.= " FROM ".MAIN_DB_PREFIX."holiday as cp";
         $sql.= " WHERE cp.rowid = ".$id;
 
@@ -247,6 +250,7 @@ class Holiday extends CommonObject
                 $this->note_public = $obj->note_public;
                 $this->fk_user_create = $obj->fk_user_create;
                 $this->fk_type = $obj->fk_type;
+                $this->entity = $obj->entity;
             }
             $this->db->free($resql);
 
@@ -813,18 +817,17 @@ class Holiday extends CommonObject
     }
 
     /**
-     *  Retourne la valeur d'un paramètre de configuration
+     *  Return value of a conf parameterfor leave module
+     *  TODO Move this into llx_const table
      *
-     *  @param	string	$name       name du paramètre de configuration
-     *  @param	int		$fk_type	Filter on type
-     *  @return string      		retourne la valeur du paramètre
+     *  @param	string	$name       name of parameter
+     *  @return string      		value of parameter
      */
-    function getConfCP($name, $fk_type=0)
+    function getConfCP($name)
     {
         $sql = "SELECT value";
         $sql.= " FROM ".MAIN_DB_PREFIX."holiday_config";
         $sql.= " WHERE name = '".$name."'";
-        if ($fk_type > 0) $sql.=" AND fk_type = ".$fk_type;
 
         dol_syslog(get_class($this).'::getConfCP name='.$name.'', LOG_DEBUG);
         $result = $this->db->query($sql);
@@ -1804,8 +1807,8 @@ class Holiday extends CommonObject
     /**
      *  Return array with list of types
      *
-     *  @param		int		$active		Status of type
-     *  @param		int		$affect		Filter on affect (a request will change sold or not)
+     *  @param		int		$active		Status of type. -1 = Both
+     *  @param		int		$affect		Filter on affect (a request will change sold or not). -1 = Both
      *  @return     array	    		Return array with list of types
      */
     function getTypes($active=-1, $affect=-1)
