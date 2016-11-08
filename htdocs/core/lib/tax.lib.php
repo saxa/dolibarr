@@ -2,7 +2,7 @@
 /* Copyright (C) 2004-2009 Laurent Destailleur	<eldy@users.sourceforge.net>
  * Copyright (C) 2006-2007 Yannick Warnier		<ywarnier@beeznest.org>
  * Copyright (C) 2011	   Regis Houssin		<regis.houssin@capnetworks.com>
- * Copyright (C) 2012	   Juanjo Menent		<jmenent@2byte.es>
+ * Copyright (C) 2012-2016 Juanjo Menent		<jmenent@2byte.es>
  * Copyright (C) 2012      Cédric Salvador      <csalvador@gpcsolutions.fr>
  * Copyright (C) 2012-2014 Raphaël Doursenaud   <rdoursenaud@gpcsolutions.fr>
  * Copyright (C) 2015      Marcos García        <marcosgdf@gmail.com>
@@ -41,7 +41,7 @@ function tax_prepare_head(ChargeSociales $object)
     $h = 0;
     $head = array();
 
-	$head[$h][0] = DOL_URL_ROOT.'/compta/sociales/charges.php?id='.$object->id;
+	$head[$h][0] = DOL_URL_ROOT.'/compta/sociales/card.php?id='.$object->id;
 	$head[$h][1] = $langs->trans('Card');
 	$head[$h][2] = 'card';
 	$h++;
@@ -179,7 +179,6 @@ function vat_by_thirdparty($db, $y, $date_start, $date_end, $modetax, $direction
         return -3;
     }
 }
-
 
 /**
  *  Gets VAT to collect for the given year (and given quarter or month)

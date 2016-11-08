@@ -54,11 +54,13 @@ $userstatic=new User($db);
 <!-- BEGIN PHP TEMPLATE CONTACTS -->
 <div class="tagtable centpercent noborder allwidth">
 
-<?php if ($permission) { ?>
+<?php 
+if ($permission) { 
+?>
 	<form class="tagtr liste_titre">
-		<div class="tagtd"><?php echo $langs->trans("Source"); ?></div>
+		<div class="tagtd"><?php echo $langs->trans("Nature"); ?></div>
 		<div class="tagtd"><?php echo $langs->trans("ThirdParty"); ?></div>
-		<div class="tagtd"><?php echo $langs->trans("Contacts"); ?></div>
+		<div class="tagtd"><?php echo $langs->trans("Users").'/'.$langs->trans("Contacts"); ?></div>
 		<div class="tagtd"><?php echo $langs->trans("ContactType"); ?></div>
 		<div class="tagtd">&nbsp;</div>
 		<div class="tagtd">&nbsp;</div>
@@ -118,7 +120,7 @@ $userstatic=new User($db);
 			<?php $selectedCompany = $formcompany->selectCompaniesForNewContact($object, 'id', $selectedCompany, 'newcompany', '', 0); ?>
 		</div>
 		<div class="tagtd maxwidthonsmartphone">
-			<?php $nbofcontacts=$form->select_contacts($selectedCompany, '', 'contactid'); ?>
+			<?php $nbofcontacts=$form->select_contacts($selectedCompany, '', 'contactid', 0, '', '', 0, 'minwidth200'); ?>
 		</div>
 		<div class="tagtd maxwidthonsmartphone">
 			<?php
@@ -132,13 +134,15 @@ $userstatic=new User($db);
 		</div>
 	</form>
 
-<?php }
-	} ?>
+<?php 
+	}
+} 
+?>
 
-	<form class="tagtr liste_titre">
-		<div class="tagtd"><?php echo $langs->trans("Source"); ?></div>
+	<form class="tagtr liste_titre liste_titre_add formnoborder">
+		<div class="tagtd"><?php echo $langs->trans("Nature"); ?></div>
 		<div class="tagtd"><?php echo $langs->trans("ThirdParty"); ?></div>
-		<div class="tagtd"><?php echo $langs->trans("Contacts"); ?></div>
+		<div class="tagtd"><?php echo $langs->trans("Users").'/'.$langs->trans("Contacts"); ?></div>
 		<div class="tagtd"><?php echo $langs->trans("ContactType"); ?></div>
 		<div class="tagtd" align="center"><?php echo $langs->trans("Status"); ?></div>
 		<div class="tagtd">&nbsp;</div>

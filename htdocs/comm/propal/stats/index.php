@@ -37,7 +37,7 @@ $mode=GETPOST("mode")?GETPOST("mode"):'customer';
 if ($mode == 'customer' && ! $user->rights->propale->lire) accessforbidden();
 if ($mode == 'supplier' && ! $user->rights->supplier_proposal->lire) accessforbidden();
 
-$object_statut=GETPOST('propal_statut');
+$object_status=GETPOST('object_status');
 
 $userid=GETPOST('userid','int');
 $socid=GETPOST('socid','int');
@@ -58,6 +58,7 @@ $langs->load('orders');
 $langs->load('companies');
 $langs->load('other');
 $langs->load('suppliers');
+$langs->load('supplier_proposal');
 
 
 /*
@@ -91,7 +92,7 @@ dol_mkdir($dir);
 
 
 $stats = new PropaleStats($db, $socid, ($userid>0?$userid:0), $mode);
-if ($object_statut != '' && $object_statut >= 0) $stats->where .= ' AND p.fk_statut IN ('.$object_statut.')';
+if ($object_status != '' && $object_status >= 0) $stats->where .= ' AND p.fk_statut IN ('.$object_status.')';
 
 // Build graphic number of object
 $data = $stats->getNbByMonthWithPrevYear($endyear,$startyear);
@@ -178,7 +179,7 @@ if (! $mesg)
     $px2->draw($filenameamount,$fileurlamount);
 }
 
-$data = $stats->getAverageByMonthWithPrevYear($endyear, $startyear, $filter);
+$data = $stats->getAverageByMonthWithPrevYear($endyear, $startyear);
 
 $fileurl_avg='';
 if (!$user->rights->societe->client->voir || $user->societe_id)
@@ -265,7 +266,7 @@ print '<div class="fichecenter"><div class="fichethirdleft">';
 	print '</td></tr>';
 	// Status
 	print '<tr><td align="left">'.$langs->trans("Status").'</td><td align="left">';
-	$formpropal->selectProposalStatus($object_statut,0,1,1,$mode);
+    $formpropal->selectProposalStatus(($object_status!=''?$object_status:-1),0,0,1,$mode,'object_status');
 	print '</td></tr>';
 	// Year
 	print '<tr><td align="left">'.$langs->trans("Year").'</td><td align="left">';
@@ -283,12 +284,12 @@ print '<div class="fichecenter"><div class="fichethirdleft">';
 print '<table class="noborder" width="100%">';
 print '<tr class="liste_titre" height="24">';
 print '<td align="center">'.$langs->trans("Year").'</td>';
-print '<td align="center">'.$langs->trans("NbOfProposals").'</td>';
-print '<td align="center">%</td>';
-print '<td align="center">'.$langs->trans("AmountTotal").'</td>';
-print '<td align="center">%</td>';
-print '<td align="center">'.$langs->trans("AmountAverage").'</td>';
-print '<td align="center">%</td>';
+print '<td align="right">'.$langs->trans("NbOfProposals").'</td>';
+print '<td align="right">%</td>';
+print '<td align="right">'.$langs->trans("AmountTotal").'</td>';
+print '<td align="right">%</td>';
+print '<td align="right">'.$langs->trans("AmountAverage").'</td>';
+print '<td align="right">%</td>';
 print '</tr>';
 
 $oldyear=0;

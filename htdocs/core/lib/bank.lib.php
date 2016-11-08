@@ -1,7 +1,8 @@
 <?php
-/* Copyright (C) 2006-2015	Laurent Destailleur	<eldy@users.sourceforge.net>
+/* Copyright (C) 2006-2016	Laurent Destailleur	<eldy@users.sourceforge.net>
  * Copyright (C) 2012		Regis Houssin		<regis.houssin@capnetworks.com>
  * Copyright (C) 2015		Alexandre Spangaro	<aspangaro.dolibarr@gmail.com>
+ * Copyright (C) 2016		Juanjo Menent   	<jmenent@2byte.es>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,12 +38,12 @@ function bank_prepare_head(Account $object)
     $head = array();
 
     $head[$h][0] = DOL_URL_ROOT . '/compta/bank/card.php?id=' . $object->id;
-    $head[$h][1] = $langs->trans("AccountCard");
+    $head[$h][1] = $langs->trans("Card");
     $head[$h][2] = 'bankname';
     $h++;
 
-    $head[$h][0] = DOL_URL_ROOT . "/compta/bank/account.php?id=" . $object->id;
-    $head[$h][1] = $langs->trans("Transactions");
+    $head[$h][0] = DOL_URL_ROOT . "/compta/bank/bankentries.php?id=" . $object->id;
+    $head[$h][1] = $langs->trans("BankTransactions");
     $head[$h][2] = 'journal';
     $h++;
 
@@ -64,7 +65,7 @@ function bank_prepare_head(Account $object)
     $head[$h][2] = 'graph';
     $h++;
 
-    if ($object->courant != 2)
+    if ($object->courant != Account::TYPE_CASH)
     {
     	$head[$h][0] = DOL_URL_ROOT."/compta/bank/releve.php?account=".$object->id;
 	    $head[$h][1] = $langs->trans("AccountStatements");
@@ -110,6 +111,11 @@ function bank_admin_prepare_head($object)
 	$head[$h][1] = $langs->trans("Miscellaneous");
 	$head[$h][2] = 'general';
 	$h++;
+
+    $head[$h][0] = DOL_URL_ROOT . '/admin/chequereceipts.php';
+    $head[$h][1] = $langs->trans("CheckReceiptShort");
+    $head[$h][2] = 'checkreceipts';
+    $h++;
 
 
 	// Show more tabs from modules

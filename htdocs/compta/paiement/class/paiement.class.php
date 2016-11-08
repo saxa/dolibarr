@@ -27,6 +27,7 @@
  *	\brief      File of class to manage payments of customers invoices
  */
 require_once DOL_DOCUMENT_ROOT .'/core/class/commonobject.class.php';
+require_once DOL_DOCUMENT_ROOT .'/multicurrency/class/multicurrency.class.php';
 
 
 /**
@@ -51,6 +52,7 @@ class Paiement extends CommonObject
 	var $montant;
 	var $amount;            // Total amount of payment
 	var $amounts=array();   // Array of amounts
+	var $multicurrency_amounts=array();   // Array of amounts
 	var $author;
 	var $paiementid;	// Type de paiement. Stocke dans fk_paiement
 	// de llx_paiement qui est lie aux types de
@@ -60,8 +62,9 @@ class Paiement extends CommonObject
 	var $bank_line;     // Id de la ligne d'ecriture bancaire
 	// fk_paiement dans llx_paiement est l'id du type de paiement (7 pour CHQ, ...)
 	// fk_paiement dans llx_paiement_facture est le rowid du paiement
+    var $fk_paiement;    // Type of paiment
 
-
+    
 	/**
 	 *	Constructor
 	 *
@@ -148,21 +151,41 @@ class Paiement extends CommonObject
 		global $conf, $langs;
 
 		$error = 0;
-
-        $now=dol_now();
-
+		$way = $this->getWay();
+		
+		$now=dol_now();
+		
         // Clean parameters
         $totalamount = 0;
+		$totalamount_converted = 0;
         $atleastonepaymentnotnull = 0;
-		foreach ($this->amounts as $key => $value)	// How payment is dispatch
+		
+		if ($way == 'dolibarr')
 		{
+			$amounts = &$this->amounts;
+			$amounts_to_update = &$this->multicurrency_amounts;
+		}
+		else
+		{
+			$amounts = &$this->multicurrency_amounts;
+			$amounts_to_update = &$this->amounts;
+		}
+		
+		foreach ($amounts as $key => $value)	// How payment is dispatch
+		{
+			$value_converted = Multicurrency::getAmountConversionFromInvoiceRate($key, $value, $way);
+			$totalamount_converted += $value_converted;
+			$amounts_to_update[$key] = price2num($value_converted, 'MT');
+			
 			$newvalue = price2num($value,'MT');
-			$this->amounts[$key] = $newvalue;
+			$amounts[$key] = $newvalue;
 			$totalamount += $newvalue;
 			if (! empty($newvalue)) $atleastonepaymentnotnull++;
 		}
+		
 		$totalamount = price2num($totalamount);
-
+		$totalamount_converted = price2num($totalamount_converted);
+		
 		// Check parameters
         if (empty($totalamount) && empty($atleastonepaymentnotnull))	 // We accept negative amounts for withdraw reject but not empty arrays
         {
@@ -174,9 +197,20 @@ class Paiement extends CommonObject
 
 		$ref = $this->getNextNumRef('');
 
-		$sql = "INSERT INTO ".MAIN_DB_PREFIX."paiement (entity, ref, datec, datep, amount, fk_paiement, num_paiement, note, fk_user_creat)";
-		$sql.= " VALUES (".$conf->entity.", '".$ref."', '". $this->db->idate($now)."', '".$this->db->idate($this->datepaye)."', '".$totalamount."', ".$this->paiementid.", '".$this->num_paiement."', '".$this->db->escape($this->note)."', ".$user->id.")";
+		if ($way == 'dolibarr')
+		{
+			$total = $totalamount;
+			$mtotal = $totalamount_converted; // Maybe use price2num with MT for the converted value
+		}
+		else
+		{
+			$total = $totalamount_converted; // Maybe use price2num with MT for the converted value
+			$mtotal = $totalamount;
+		}
 
+		$sql = "INSERT INTO ".MAIN_DB_PREFIX."paiement (entity, ref, datec, datep, amount, multicurrency_amount, fk_paiement, num_paiement, note, fk_user_creat)";
+		$sql.= " VALUES (".$conf->entity.", '".$ref."', '". $this->db->idate($now)."', '".$this->db->idate($this->datepaye)."', '".$total."', '".$mtotal."', ".$this->paiementid.", '".$this->num_paiement."', '".$this->db->escape($this->note)."', ".$user->id.")";
+		
 		dol_syslog(get_class($this)."::Create insert paiement", LOG_DEBUG);
 		$resql = $this->db->query($sql);
 		if ($resql)
@@ -190,9 +224,9 @@ class Paiement extends CommonObject
 				if (is_numeric($amount) && $amount <> 0)
 				{
 					$amount = price2num($amount);
-					$sql = 'INSERT INTO '.MAIN_DB_PREFIX.'paiement_facture (fk_facture, fk_paiement, amount)';
-					$sql .= ' VALUES ('.$facid.', '. $this->id.', \''.$amount.'\')';
-
+					$sql = 'INSERT INTO '.MAIN_DB_PREFIX.'paiement_facture (fk_facture, fk_paiement, amount, multicurrency_amount)';
+					$sql .= ' VALUES ('.$facid.', '. $this->id.', \''.$amount.'\', \''.$this->multicurrency_amounts[$key].'\')';
+		
 					dol_syslog(get_class($this).'::Create Amount line '.$key.' insert paiement_facture', LOG_DEBUG);
 					$resql=$this->db->query($sql);
 					if ($resql)
@@ -277,8 +311,9 @@ class Paiement extends CommonObject
 
 		if (! $error)
 		{
-		    $this->amount=$totalamount;
-		    $this->total=$totalamount;    // deprecated
+		    $this->amount=$total;
+		    $this->total=$total;    // deprecated
+		    $this->multicurrency_amount=$mtotal;
 			$this->db->commit();
 			return $this->id;
 		}
@@ -434,9 +469,13 @@ class Paiement extends CommonObject
 
             $acc = new Account($this->db);
             $result=$acc->fetch($this->fk_account);
-
-            $totalamount=$this->amount;
+			
+			$totalamount=$this->amount;
             if (empty($totalamount)) $totalamount=$this->total; // For backward compatibility
+            
+            // if dolibarr currency != bank currency then we received an amount in customer currency (currently I don't manage the case : my currency is USD, the customer currency is EUR and he paid me in GBP. Seems no sense for me)
+            if (!empty($conf->multicurrency->enabled) && $conf->currency != $acc->currency_code) $totalamount=$this->multicurrency_amount;
+			
             if ($mode == 'payment_supplier') $totalamount=-$totalamount;
 
             // Insert payment into llx_bank
@@ -524,6 +563,18 @@ class Paiement extends CommonObject
                         }
                     }
                 }
+
+				// Add link 'WithdrawalPayment' in bank_url
+				if (! $error && $label == '(WithdrawalPayment)')
+				{
+					$result=$acc->add_url_line(
+						$bank_line_id,
+						$this->id_prelevement,
+						DOL_URL_ROOT.'/compta/prelevement/card.php?id=',
+						$this->num_paiement,
+						'withdraw'
+					);
+				}
 
 	            if (! $error && ! $notrigger)
 				{
@@ -859,6 +910,31 @@ class Paiement extends CommonObject
 	}
 
 	/**
+	 * 	get the right way of payment
+	 * 
+	 * 	@return 	string 	'dolibarr' if standard comportment or paid in dolibarr currency, 'customer' if payment received from multicurrency inputs
+	 */
+	function getWay()
+	{
+		global $conf;
+		
+		$way = 'dolibarr';
+		if (!empty($conf->multicurrency->enabled))
+		{
+			foreach ($this->multicurrency_amounts as $value)
+			{
+				if (!empty($value)) // one value found then payment is in invoice currency
+				{
+					$way = 'customer';
+					break;
+				}
+			}
+		}
+		
+		return $way;
+	}
+	
+	/**
 	 *  Initialise an instance with random values.
 	 *  Used to build previews or test instances.
 	 *	id must be 0 if object instance is a specimen.
@@ -896,6 +972,17 @@ class Paiement extends CommonObject
 
 		$result='';
         $label = $langs->trans("ShowPayment").': '.$this->ref;
+	$arraybill = $this->getBillsArray();
+	if (count($arraybill) >0)
+	{
+		require_once DOL_DOCUMENT_ROOT.'/compta/facture/class/facture.class.php';
+		$facturestatic=new Facture($this->db);
+		foreach ($arraybill as $billid)
+		{
+			$facturestatic->fetch($billid);
+			$label .='<br> '.$facturestatic->getNomUrl(1).' '.$facturestatic->getLibStatut(2,1);
+		}
+	}
 
         $link = '<a href="'.DOL_URL_ROOT.'/compta/paiement/card.php?id='.$this->id.'" title="'.dol_escape_htmltag($label, 1).'" class="classfortooltip">';
 		$linkend='</a>';

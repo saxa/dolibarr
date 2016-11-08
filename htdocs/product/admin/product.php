@@ -5,9 +5,10 @@
  * Copyright (C) 2007      Auguria SARL         <info@auguria.org>
  * Copyright (C) 2005-2012 Regis Houssin        <regis.houssin@capnetworks.com>
  * Copyright (C) 2011-2012 Juanjo Menent        <jmenent@2byte.es>
- * Copyright (C) 2012      Christophe Battarel   <christophe.battarel@altairis.fr>
+ * Copyright (C) 2012      Christophe Battarel  <christophe.battarel@altairis.fr>
  * Copyright (C) 2012      Cedric Salvador      <csalvador@gpcsolutions.fr>
- * Copyright (C) 2016		Charlie Benke		 <charlie@patas-monkey.com>
+ * Copyright (C) 2016      Charlie Benke		<charlie@patas-monkey.com>
+ * Copyright (C) 2016	   Ferran Marcet		<fmarcet@2byte.es>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61,7 +62,9 @@ if ($conf->global->MAIN_FEATURES_LEVEL >= 2)
 }
 
 // Clean param
-if (! empty($conf->global->PRODUIT_MULTIPRICES) && empty($conf->global->PRODUIT_MULTIPRICES_LIMIT)) $conf->global->PRODUIT_MULTIPRICES_LIMIT = 5;
+if (! empty($conf->global->PRODUIT_MULTIPRICES) && empty($conf->global->PRODUIT_MULTIPRICES_LIMIT)) {
+	dolibarr_set_const($db, 'PRODUIT_MULTIPRICES_LIMIT', 5, 'chaine', 0, '', $conf->entity);
+}
 
 
 
@@ -112,7 +115,7 @@ if ($action == 'setModuleOptions')
 	}
 }
 
-if ($action == 'other' && GETPOST('value_PRODUIT_LIMIT_SIZE') > 0)
+if ($action == 'other' && GETPOST('value_PRODUIT_LIMIT_SIZE') >= 0)
 {
 	$res = dolibarr_set_const($db, "PRODUIT_LIMIT_SIZE", GETPOST('value_PRODUIT_LIMIT_SIZE'),'chaine',0,'',$conf->entity);
 }
@@ -323,7 +326,7 @@ $form=new Form($db);
  */
 $dirproduct=array('/core/modules/product/');
 
-print load_fiche_titre($langs->trans("ProductCodeChecker"));
+print load_fiche_titre($langs->trans("ProductCodeChecker"), '', '');
 
 print '<table class="noborder" width="100%">'."\n";
 print '<tr class="liste_titre">'."\n";
@@ -400,9 +403,6 @@ foreach ($dirproduct as $dirroot)
 print '</table>';
 
 
-print '<br>';
-print_titre($langs->trans("ModelModulesProduct"));
-
 // Load array def with activated templates
 $def = array();
 $sql = "SELECT nom";
@@ -414,135 +414,142 @@ if ($resql)
 {
 	$i = 0;
 	$num_rows=$db->num_rows($resql);
-	while ($i < $num_rows)
+	if ($num_rows > 0)
 	{
-		$array = $db->fetch_array($resql);
-		array_push($def, $array[0]);
-		$i++;
+	    print '<br>';
+	    print load_fiche_titre($langs->trans("ModelModulesProduct"), '', '');
+
+    	while ($i < $num_rows)
+    	{
+    		$array = $db->fetch_array($resql);
+    		array_push($def, $array[0]);
+    		$i++;
+    	}
+        
+        print '<table class="noborder" width="100%">';
+        print '<tr class="liste_titre">';
+        print '<td width="140">'.$langs->trans("Name").'</td>';
+        print '<td>'.$langs->trans("Description").'</td>';
+        print '<td align="center" width="80">'.$langs->trans("Status").'</td>';
+        print '<td align="center" width="60">'.$langs->trans("ShortInfo").'</td>';
+        print '<td align="center" width="60">'.$langs->trans("Preview").'</td>';
+        print "</tr>\n";
+        
+        $var=true;
+        foreach ($dirproduct as $dirroot)
+        {
+        	$dir = dol_buildpath($dirroot.'core/modules/product/doc/',0);
+        	$handle=@opendir($dir);
+        	if (is_resource($handle))
+        	{
+        		while (($file = readdir($handle))!==false)
+        		{
+        			if (preg_match('/\.modules\.php$/i',$file))
+        			{
+        				$name = substr($file, 4, dol_strlen($file) -16);
+        				$classname = substr($file, 0, dol_strlen($file) -12);
+        
+        			    try {
+                			dol_include_once($dirroot.'core/modules/product/doc/'.$file);
+            			}
+            			catch(Exception $e)
+            			{
+            			    dol_syslog($e->getMessage(), LOG_ERR);
+            			}
+        
+            			$module = new $classname($db);
+        
+        				$modulequalified=1;
+        				if (! empty($module->version)) {
+        					if ($module->version == 'development'  && $conf->global->MAIN_FEATURES_LEVEL < 2) $modulequalified=0;
+        					else if ($module->version == 'experimental' && $conf->global->MAIN_FEATURES_LEVEL < 1) $modulequalified=0;
+        				}
+        
+        				if ($modulequalified)
+        				{
+        					$var = !$var;
+        					print '<tr '.$bc[$var].'><td width="100">';
+        					print $module->name;
+        					print "</td><td>\n";
+        					if (method_exists($module,'info')) print $module->info($langs);
+        					else print $module->description;
+        					print '</td>';
+        
+        					// Activate / Disable
+        					if (in_array($name, $def))
+        					{
+        						print "<td align=\"center\">\n";
+        						print '<a href="'.$_SERVER["PHP_SELF"].'?action=del&value='.$name.'&type=product&scandir='.$module->scandir.'&label='.urlencode($module->name).'">';
+        						print img_picto($langs->trans("Enabled"),'switch_on');
+        						print '</a>';
+        						print "</td>";
+        					}
+        					else
+        					{
+        						if (versioncompare($module->phpmin,versionphparray()) > 0)
+        						{
+        							print "<td align=\"center\">\n";
+        							print img_picto(dol_escape_htmltag($langs->trans("ErrorModuleRequirePHPVersion",join('.',$module->phpmin))),'switch_off');
+        							print "</td>";
+        						}
+        						else
+        						{
+        							print "<td align=\"center\">\n";
+        							print '<a href="'.$_SERVER["PHP_SELF"].'?action=set&value='.$name.'&type=product&scandir='.$module->scandir.'&label='.urlencode($module->name).'">'.img_picto($langs->trans("Disabled"),'switch_off').'</a>';
+        							print "</td>";
+        						}
+        					}
+        
+        					// Info
+        					$htmltooltip =    ''.$langs->trans("Name").': '.$module->name;
+        					$htmltooltip.='<br>'.$langs->trans("Type").': '.($module->type?$module->type:$langs->trans("Unknown"));
+        					if ($module->type == 'pdf')
+        					{
+        						$htmltooltip.='<br>'.$langs->trans("Height").'/'.$langs->trans("Width").': '.$module->page_hauteur.'/'.$module->page_largeur;
+        					}
+        					$htmltooltip.='<br><br><u>'.$langs->trans("FeaturesSupported").':</u>';
+        					$htmltooltip.='<br>'.$langs->trans("WatermarkOnDraft").': '.yn((! empty($module->option_draft_watermark)?$module->option_draft_watermark:''), 1, 1);
+        
+        					print '<td align="center" class="nowrap">';
+        					print $form->textwithpicto('',$htmltooltip,1,0);
+        					print '</td>';
+        
+        					// Preview
+        					print '<td align="center" class="nowrap">';
+        					if ($module->type == 'pdf')
+        					{
+        						$linkspec='<a href="'.$_SERVER["PHP_SELF"].'?action=specimen&module='.$name.'">'.img_object($langs->trans("Preview"),'bill').'</a>';
+        					}
+        					else
+        					{
+        						$linkspec=img_object($langs->trans("PreviewNotAvailable"),'generic');
+        					}
+        					print $linkspec;
+        					print '</td>';
+        
+        					print "</tr>\n";
+        				}
+        			}
+        		}
+        		closedir($handle);
+        	}
+        }
+        print '</table>';
 	}
 }
 else
 {
-	dol_print_error($db);
+    dol_print_error($db);
 }
-
-print '<table class="noborder" width="100%">';
-print '<tr class="liste_titre">';
-print '<td width="140">'.$langs->trans("Name").'</td>';
-print '<td>'.$langs->trans("Description").'</td>';
-print '<td align="center" width="80">'.$langs->trans("Status").'</td>';
-print '<td align="center" width="60">'.$langs->trans("ShortInfo").'</td>';
-print '<td align="center" width="60">'.$langs->trans("Preview").'</td>';
-print "</tr>\n";
-
-$var=true;
-foreach ($dirproduct as $dirroot)
-{
-	$dir = dol_buildpath($dirroot.'core/modules/product/doc/',0);
-	$handle=@opendir($dir);
-	if (is_resource($handle))
-	{
-		while (($file = readdir($handle))!==false)
-		{
-			if (preg_match('/\.modules\.php$/i',$file))
-			{
-				$name = substr($file, 4, dol_strlen($file) -16);
-				$classname = substr($file, 0, dol_strlen($file) -12);
-
-			    try {
-        			dol_include_once($dirroot.'core/modules/product/doc/'.$file);
-    			}
-    			catch(Exception $e)
-    			{
-    			    dol_syslog($e->getMessage(), LOG_ERR);
-    			}
-
-    			$module = new $classname($db);
-
-				$modulequalified=1;
-				if (! empty($module->version)) {
-					if ($module->version == 'development'  && $conf->global->MAIN_FEATURES_LEVEL < 2) $modulequalified=0;
-					else if ($module->version == 'experimental' && $conf->global->MAIN_FEATURES_LEVEL < 1) $modulequalified=0;
-				}
-
-				if ($modulequalified)
-				{
-					$var = !$var;
-					print '<tr '.$bc[$var].'><td width="100">';
-					print $module->name;
-					print "</td><td>\n";
-					if (method_exists($module,'info')) print $module->info($langs);
-					else print $module->description;
-					print '</td>';
-
-					// Activate / Disable
-					if (in_array($name, $def))
-					{
-						print "<td align=\"center\">\n";
-						print '<a href="'.$_SERVER["PHP_SELF"].'?action=del&value='.$name.'&type=product&scandir='.$module->scandir.'&label='.urlencode($module->name).'">';
-						print img_picto($langs->trans("Enabled"),'switch_on');
-						print '</a>';
-						print "</td>";
-					}
-					else
-					{
-						if (versioncompare($module->phpmin,versionphparray()) > 0)
-						{
-							print "<td align=\"center\">\n";
-							print img_picto(dol_escape_htmltag($langs->trans("ErrorModuleRequirePHPVersion",join('.',$module->phpmin))),'switch_off');
-							print "</td>";
-						}
-						else
-						{
-							print "<td align=\"center\">\n";
-							print '<a href="'.$_SERVER["PHP_SELF"].'?action=set&value='.$name.'&type=product&scandir='.$module->scandir.'&label='.urlencode($module->name).'">'.img_picto($langs->trans("Disabled"),'switch_off').'</a>';
-							print "</td>";
-						}
-					}
-
-					// Info
-					$htmltooltip =    ''.$langs->trans("Name").': '.$module->name;
-					$htmltooltip.='<br>'.$langs->trans("Type").': '.($module->type?$module->type:$langs->trans("Unknown"));
-					if ($module->type == 'pdf')
-					{
-						$htmltooltip.='<br>'.$langs->trans("Height").'/'.$langs->trans("Width").': '.$module->page_hauteur.'/'.$module->page_largeur;
-					}
-					$htmltooltip.='<br><br><u>'.$langs->trans("FeaturesSupported").':</u>';
-					$htmltooltip.='<br>'.$langs->trans("WatermarkOnDraft").': '.yn((! empty($module->option_draft_watermark)?$module->option_draft_watermark:''), 1, 1);
-
-					print '<td align="center" class="nowrap">';
-					print $form->textwithpicto('',$htmltooltip,1,0);
-					print '</td>';
-
-					// Preview
-					print '<td align="center" class="nowrap">';
-					if ($module->type == 'pdf')
-					{
-						$linkspec='<a href="'.$_SERVER["PHP_SELF"].'?action=specimen&module='.$name.'">'.img_object($langs->trans("Preview"),'bill').'</a>';
-					}
-					else
-					{
-						$linkspec=img_object($langs->trans("PreviewNotAvailable"),'generic');
-					}
-					print $linkspec;
-					print '</td>';
-
-					print "</tr>\n";
-				}
-			}
-		}
-		closedir($handle);
-	}
-}
-print '</table>';
-
+    
+    
 /*
  * Other conf
  */
 
 print "<br>";
 
-print load_fiche_titre($langs->trans("ProductOtherConf"));
+print load_fiche_titre($langs->trans("ProductOtherConf"), '', '');
 
 
 
@@ -577,6 +584,10 @@ if (!empty($conf->global->PRODUIT_CUSTOMER_PRICES_BY_QTY)) $current_rule='PRODUI
 if (!empty($conf->global->PRODUIT_CUSTOMER_PRICES)) $current_rule='PRODUIT_CUSTOMER_PRICES';
 if ((!empty($conf->global->PRODUIT_CUSTOMER_PRICES_BY_QTY)) && (!empty($conf->global->PRODUIT_MULTIPRICES))) $current_rule='PRODUIT_CUSTOMER_PRICES_BY_QTY&PRODUIT_MULTIPRICES';
 print $form->selectarray("princingrule",$select_pricing_rules,$current_rule);
+if ( empty($conf->multicompany->enabled))
+{
+    print $langs->trans("SamePriceAlsoForSharedCompanies");
+}
 print '</td><td align="right" rowspan="'.$rowspan.'" class="nohover">';
 print '<input type="submit" class="button" value="'.$langs->trans("Modify").'">';
 print '</td>';

@@ -1,5 +1,7 @@
 # Dolibarr language file - Source file is en_US - oauth
 ConfigOAuth=Oauth Yapılandırma
+OAuthServices=OAuth services
+ManualTokenGeneration=Manual token generation
 NoAccessToken=Yerel veritabanına kayıtlı erişim belirteçi yok
 HasAccessToken=Bir belirteç oluşturuldu ve yerel veritabanına kaydedildi
 NewTokenStored=Belirteç kabul edildi ve kaydedildi
@@ -8,7 +10,17 @@ TokenDeleted=Belirteç silindi
 RequestAccess=Erişim ve kaydedilecek yeni bir belirteç alma isteği/yenilemesi için buraya tıklayın
 DeleteAccess=Belirteçi silmek için burayı tıkla
 UseTheFollowingUrlAsRedirectURI=OAuth sağlayıcınız üzerinde kimlik oluştururken Yönlendirme URI olarak aşağıdaki URL'yi kullanın:
-ListOfSupportedOauthProviders=Enter here credential provided by your OAuth2 provider. Only supported OAuth2 providers are visible here. This setup may be used by other modules that need OAuth2 authentication.
-OAUTH_GOOGLE_NAME=Api Google
-OAUTH_GOOGLE_ID=Api Google Id
-OAUTH_GOOGLE_SECRET=Api Google Parolası
+ListOfSupportedOauthProviders=OAuth2 sağlayıcınız tarafınıdan verilen kimlik bilgilerini burada girin. Burada yalnızca desteklenen OAuth2 sağlayıcılar görünür. Bu ayarlar OAuth2 kimlik doğrulaması gerektiren diğer modüller tarafından da kullanılabilir.
+TOKEN_ACCESS=
+TOKEN_REFRESH=Token Refresh Present
+TOKEN_EXPIRED=Token expired
+TOKEN_EXPIRE_AT=Token expire at
+TOKEN_DELETE=Delete saved token
+OAUTH_GOOGLE_NAME=Oauth Google service
+OAUTH_GOOGLE_ID=Oauth Google Id
+OAUTH_GOOGLE_SECRET=Oauth Google Secret
+OAUTH_GOOGLE_DESC=Go on <a class="notasortlink" href="https://console.developers.google.com/" target="_blank">this page</a> then "Credentials" to create Oauth credentials
+OAUTH_GITHUB_NAME=Oauth GitHub service
+OAUTH_GITHUB_ID=Oauth GitHub Id
+OAUTH_GITHUB_SECRET=Oauth GitHub Secret
+OAUTH_GITHUB_DESC=Go on <a class="notasortlink" href="https://github.com/settings/developers" target="_blank">this page</a> then "Register a new application" to create Oauth credentials

@@ -9,7 +9,8 @@
  * Copyright (C) 2010-2011 Philippe Grand        <philippe.grand@atoo-net.com>
  * Copyright (C) 2012      Christophe Battarel   <christophe.battarel@altairis.fr>
  * Copyright (C) 2013      Cédric Salvador       <csalvador@gpcsolutions.fr>
-*
+ * Copyright (C) 2016	   Ferran Marcet         <fmarcet@2byte.es>
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
@@ -33,8 +34,8 @@
 require '../main.inc.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formother.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formsupplier_proposal.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/core/class/html.formpropal.class.php';
 require_once DOL_DOCUMENT_ROOT.'/supplier_proposal/class/supplier_proposal.class.php';
 if (! empty($conf->projet->enabled))
 	require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
@@ -61,6 +62,8 @@ $sall=GETPOST("sall");
 $mesg=(GETPOST("msg") ? GETPOST("msg") : GETPOST("mesg"));
 $year=GETPOST("year");
 $month=GETPOST("month");
+$yearvalid=GETPOST("yearvalid");
+$monthvalid=GETPOST("monthvalid");
 
 // Nombre de ligne pour choix de produit/service predefinis
 $NBLINES=4;
@@ -78,20 +81,16 @@ if (! empty($socid))
 }
 $result = restrictedArea($user, $module, $objectid, $dbtable);
 
-if (GETPOST("button_removefilter") || GETPOST("button_removefilter_x"))	// Both tests are required to be compatible with all browsers
-{
-    $search_categ='';
-    $search_user='';
-    $search_sale='';
-    $search_ref='';
-    $search_societe='';
-    $search_montant_ht='';
-    $search_author='';
-    $year='';
-    $month='';
-	$viewstatut='';
-	$object_statut='';
-}
+$limit = GETPOST('limit')?GETPOST('limit','int'):$conf->liste_limit;
+$sortfield = GETPOST("sortfield",'alpha');
+$sortorder = GETPOST("sortorder",'alpha');
+$page = GETPOST("page",'int');
+if ($page == -1) { $page = 0; }
+$offset = $limit * $page;
+$pageprev = $page - 1;
+$pagenext = $page + 1;
+if (! $sortfield) $sortfield='p.date_livraison';
+if (! $sortorder) $sortorder='DESC';
 
 if($object_statut != '')
 $viewstatut=$object_statut;
@@ -116,10 +115,70 @@ $hookmanager->initHooks(array('supplier_proposallist'));
  * Actions
  */
 
+if (GETPOST('cancel')) { $action='list'; $massaction=''; }
+if (! GETPOST('confirmmassaction')) { $massaction=''; }
+
+$parameters=array();
+$reshook=$hookmanager->executeHooks('doActions',$parameters,$object,$action);    // Note that $action and $object may have been modified by some hooks
+if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+
+include DOL_DOCUMENT_ROOT.'/core/actions_changeselectedfields.inc.php';
+
+if (GETPOST("button_removefilter_x") || GETPOST("button_removefilter.x") ||GETPOST("button_removefilter")) // All test are required to be compatible with all browsers
+{
+    $search_categ='';
+    $search_user='';
+    $search_sale='';
+    $search_ref='';
+    $search_societe='';
+    $search_montant_ht='';
+    $search_author='';
+    $yearvalid='';
+    $monthvalid='';
+    $year='';
+    $month='';
+    $viewstatut='';
+    $object_statut='';
+}
 
 $parameters=array('socid'=>$socid);
 $reshook=$hookmanager->executeHooks('doActions',$parameters,$object,$action);    // Note that $action and $object may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+
+if (empty($reshook))
+{
+    // Mass actions. Controls on number of lines checked
+    $maxformassaction=1000;
+    if (! empty($massaction) && count($toselect) < 1)
+    {
+        $error++;
+        setEventMessages($langs->trans("NoLineChecked"), null, "warnings");
+    }
+    if (! $error && count($toselect) > $maxformassaction)
+    {
+        setEventMessages($langs->trans('TooManyRecordForMassAction',$maxformassaction), null, 'errors');
+        $error++;
+    }
+
+    // Action to delete
+    /*
+    if ($action == 'confirm_delete')
+    {
+        $result=$object->delete($user);
+        if ($result > 0)
+        {
+            // Delete OK
+            setEventMessages("RecordDeleted", null, 'mesgs');
+            header("Location: ".dol_buildpath('/mymodule/list.php',1));
+            exit;
+        }
+        else
+        {
+            if (! empty($object->errors)) setEventMessages(null,$object->errors,'errors');
+            else setEventMessages($object->error,null,'errors');
+        }
+    }*/
+}
 
 
 
@@ -132,26 +191,13 @@ llxHeader('',$langs->trans('CommRequest'),'EN:Ask_Price_Supplier|FR:Demande_de_p
 $form = new Form($db);
 $formother = new FormOther($db);
 $formfile = new FormFile($db);
-$formsupplier_proposal = new FormSupplierProposal($db);
+$formpropal = new FormPropal($db);
 $companystatic=new Societe($db);
 
 $now=dol_now();
 
-$sortfield = GETPOST("sortfield",'alpha');
-$sortorder = GETPOST("sortorder",'alpha');
-$limit = GETPOST('limit')?GETPOST('limit','int'):$conf->liste_limit;
-$page = GETPOST("page",'int');
-if ($page == -1) { $page = 0; }
-$offset = $limit * $page;
-$pageprev = $page - 1;
-$pagenext = $page + 1;
-
-if (! $sortfield) $sortfield='p.date_livraison';
-if (! $sortorder) $sortorder='DESC';
-
-
-$sql = 'SELECT s.rowid, s.nom as name, s.town, s.client, s.code_client,';
-$sql.= ' p.rowid as supplier_proposalid, p.note_private, p.total_ht, p.ref, p.fk_statut, p.fk_user_author, p.date_livraison as dp,';
+$sql = 'SELECT s.rowid as socid, s.nom as name, s.town, s.client, s.code_client,';
+$sql.= ' p.rowid, p.note_private, p.total_ht, p.ref, p.fk_statut, p.fk_user_author, p.date_valid, p.date_livraison as dp,';
 if (! $user->rights->societe->client->voir && ! $socid) $sql .= " sc.fk_soc, sc.fk_user,";
 $sql.= ' u.login';
 $sql.= ' FROM '.MAIN_DB_PREFIX.'societe as s, '.MAIN_DB_PREFIX.'supplier_proposal as p';
@@ -170,28 +216,13 @@ if (! $user->rights->societe->client->voir && ! $socid) //restriction
 {
 	$sql.= " AND s.rowid = sc.fk_soc AND sc.fk_user = " .$user->id;
 }
-if ($search_ref) {
-	$sql .= natural_search('p.ref', $search_ref);
-}
-if ($search_societe) {
-	$sql .= natural_search('s.nom', $search_societe);
-}
-if ($search_author)
-{
-	$sql.= " AND u.login LIKE '%".$db->escape(trim($search_author))."%'";
-}
-if ($search_montant_ht)
-{
-	$sql.= " AND p.total_ht='".$db->escape(price2num(trim($search_montant_ht)))."'";
-}
-if ($sall) {
-    $sql .= natural_search(array_keys($fieldstosearchall), $sall);
-}
+if ($search_ref)     $sql .= natural_search('p.ref', $search_ref);
+if ($search_societe) $sql .= natural_search('s.nom', $search_societe);
+if ($search_author)  $sql.= " AND u.login LIKE '%".$db->escape(trim($search_author))."%'";
+if ($search_montant_ht) $sql.= " AND p.total_ht='".$db->escape(price2num(trim($search_montant_ht)))."'";
+if ($sall) $sql .= natural_search(array_keys($fieldstosearchall), $sall);
 if ($socid) $sql.= ' AND s.rowid = '.$socid;
-if ($viewstatut <> '')
-{
-	$sql.= ' AND p.fk_statut IN ('.$viewstatut.')';
-}
+if ($viewstatut <> '') $sql.= ' AND p.fk_statut IN ('.$viewstatut.')';
 if ($month > 0)
 {
     if ($year > 0 && empty($day))
@@ -204,6 +235,19 @@ if ($month > 0)
 else if ($year > 0)
 {
 	$sql.= " AND p.date_livraison BETWEEN '".$db->idate(dol_get_first_day($year,1,false))."' AND '".$db->idate(dol_get_last_day($year,12,false))."'";
+}
+if ($monthvalid > 0)
+{
+    if ($yearvalid > 0 && empty($dayvalid))
+    $sql.= " AND p.date_valid BETWEEN '".$db->idate(dol_get_first_day($yearvalid,$monthvalid,false))."' AND '".$db->idate(dol_get_last_day($yearvalid,$monthvalid,false))."'";
+    else if ($yearvalid > 0 && ! empty($dayvalid))
+    $sql.= " AND p.date_valid BETWEEN '".$db->idate(dol_mktime(0, 0, 0, $monthvalid, $dayvalid, $yearvalid))."' AND '".$db->idate(dol_mktime(23, 59, 59, $monthvalid, $dayvalid, $yearvalid))."'";
+    else
+    $sql.= " AND date_format(p.date_valid, '%m') = '".$monthvalid."'";
+}
+else if ($yearvalid > 0)
+{
+	$sql.= " AND p.date_valid BETWEEN '".$db->idate(dol_get_first_day($yearvalid,1,false))."' AND '".$db->idate(dol_get_last_day($yearvalid,12,false))."'";
 }
 if ($search_sale > 0) $sql.= " AND s.rowid = sc.fk_soc AND sc.fk_user = " .$search_sale;
 if ($search_user > 0)
@@ -221,10 +265,8 @@ if (empty($conf->global->MAIN_DISABLE_FULL_SCANLIST))
 	$nbtotalofrecords = $db->num_rows($result);
 }
 
-
 $sql.= $db->plimit($limit + 1,$offset);
 $result=$db->query($sql);
-
 if ($result)
 {
 	$objectstatic=new SupplierProposal($db);
@@ -238,6 +280,9 @@ if ($result)
 	}
 
 	$param='&socid='.$socid.'&viewstatut='.$viewstatut;
+    if (! empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) $param.='&contextpage='.$contextpage;
+	if ($limit > 0 && $limit != $conf->liste_limit) $param.='&limit='.$limit;
+	if ($sall)				 $param.='&sall='.$sall;
 	if ($month)              $param.='&month='.$month;
 	if ($year)               $param.='&year='.$year;
     if ($search_ref)         $param.='&search_ref=' .$search_ref;
@@ -246,7 +291,6 @@ if ($result)
 	if ($search_sale > 0)    $param.='&search_sale='.$search_sale;
 	if ($search_montant_ht)  $param.='&search_montant_ht='.$search_montant_ht;
 	if ($search_author)  	 $param.='&search_author='.$search_author;
-	print_barre_liste($langs->trans('ListOfSupplierProposal').' '.($socid?'- '.$soc->name:''), $page, $_SERVER["PHP_SELF"],$param,$sortfield,$sortorder,'',$num,$nbtotalofrecords);
 
 	// Lignes des champs de filtre
 	print '<form method="GET" action="'.$_SERVER["PHP_SELF"].'">';
@@ -256,6 +300,8 @@ if ($result)
 	print '<input type="hidden" name="sortfield" value="'.$sortfield.'">';
 	print '<input type="hidden" name="sortorder" value="'.$sortorder.'">';
 	
+	print_barre_liste($langs->trans('ListOfSupplierProposal').' '.($socid?'- '.$soc->name:''), $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, '', $num, $nbtotalofrecords, 'title_commercial.png', 0, '', '', $limit);
+
 	if ($sall)
 	{
 	    foreach($fieldstosearchall as $key => $val) $fieldstosearchall[$key]=$langs->trans($val);
@@ -299,6 +345,7 @@ if ($result)
     print '<tr class="liste_titre">';
 	print_liste_field_titre($langs->trans('Ref'),$_SERVER["PHP_SELF"],'p.ref','',$param,'',$sortfield,$sortorder);
 	print_liste_field_titre($langs->trans('Supplier'),$_SERVER["PHP_SELF"],'s.nom','',$param,'',$sortfield,$sortorder);
+	print_liste_field_titre($langs->trans('Date'),$_SERVER["PHP_SELF"],'p.date_valid','',$param, 'align="center"',$sortfield,$sortorder);
 	print_liste_field_titre($langs->trans('SupplierProposalDate'),$_SERVER["PHP_SELF"],'p.date_livraison','',$param, 'align="center"',$sortfield,$sortorder);
 	print_liste_field_titre($langs->trans('AmountHT'),$_SERVER["PHP_SELF"],'p.total_ht','',$param, 'align="right"',$sortfield,$sortorder);
 	print_liste_field_titre($langs->trans('Author'),$_SERVER["PHP_SELF"],'u.login','',$param,'align="center"',$sortfield,$sortorder);
@@ -314,6 +361,15 @@ if ($result)
 	print '<input class="flat" type="text" size="12" name="search_societe" value="'.$search_societe.'">';
 	print '</td>';
 
+	// Date valid
+	print '<td class="liste_titre" colspan="1" align="center">';
+	//print $langs->trans('Month').': ';
+	print '<input class="flat" type="text" size="1" maxlength="2" name="monthvalid" value="'.$monthvalid.'">';
+	//print '&nbsp;'.$langs->trans('Year').': ';
+	$syearvalid = $yearvalid;
+	$formother->select_year($syearvalid,'yearvalid',1, 20, 5);
+	print '</td>';
+	
 	// Date
 	print '<td class="liste_titre" colspan="1" align="center">';
 	//print $langs->trans('Month').': ';
@@ -332,12 +388,12 @@ if ($result)
 	print '<input class="flat" size="10" type="text" name="search_author" value="'.$search_author.'">';
 	print '</td>';
 	print '<td class="liste_titre" align="right">';
-	$formsupplier_proposal->selectSupplierProposalStatus($viewstatut,1);
+	$formpropal->selectProposalStatus($viewstatut,1,0,1,'supplier');
 	print '</td>';
-
+	// Check boxes
 	print '<td class="liste_titre" align="right">';
-	print '<input type="image" name="button_search" class="liste_titre" src="'.img_picto($langs->trans("Search"),'search.png','','',1).'" value="'.dol_escape_htmltag($langs->trans("Search")).'" title="'.dol_escape_htmltag($langs->trans("Search")).'">';
-	print '<input type="image" name="button_removefilter" class="liste_titre" src="'.img_picto($langs->trans("RemoveFilter"),'searchclear.png','','',1).'" value="'.dol_escape_htmltag($langs->trans("RemoveFilter")).'" title="'.dol_escape_htmltag($langs->trans("RemoveFilter")).'">';
+	$searchpitco=$form->showFilterAndCheckAddButtons(0);
+	print $searchpitco;
 	print '</td>';
 
 	print "</tr>\n";
@@ -348,73 +404,93 @@ if ($result)
 
 	while ($i < min($num,$limit))
 	{
-		$objp = $db->fetch_object($result);
+		$obj = $db->fetch_object($result);
 		$now = dol_now();
 		$var=!$var;
+
+		$objectstatic->id=$obj->rowid;
+		$objectstatic->ref=$obj->ref;
+
 		print '<tr '.$bc[$var].'>';
 		print '<td class="nowrap">';
 
-		$objectstatic->id=$objp->supplier_proposalid;
-		$objectstatic->ref=$objp->ref;
-
 		print '<table class="nobordernopadding"><tr class="nocellnopadd">';
+		// Picto + Ref
 		print '<td class="nobordernopadding nowrap">';
 		print $objectstatic->getNomUrl(1);
 		print '</td>';
-
-		print '<td style="min-width: 20px" class="nobordernopadding nowrap">';
-		if ($objp->fk_statut == 1 && $db->jdate($objp->dfv) < ($now - $conf->supplier_proposal->cloture->warning_delay)) print img_warning($langs->trans("Late"));
-		if (! empty($objp->note_private))
+		// Warning
+		$warnornote='';
+		if ($obj->fk_statut == 1 && $db->jdate($obj->date_valid) < ($now - $conf->supplier_proposal->warning_delay)) $warnornote.=img_warning($langs->trans("Late"));
+		if (! empty($obj->note_private))
 		{
-			print ' <span class="note">';
-			print '<a href="'.DOL_URL_ROOT.'/supplier_proposal/note.php?id='.$objp->supplier_proposalid.'">'.img_picto($langs->trans("ViewPrivateNote"),'object_generic').'</a>';
-			print '</span>';
+			$warnornote.=($warnornote?' ':'');
+			$warnornote.= '<span class="note">';
+			$warnornote.= '<a href="note.php?id='.$obj->rowid.'">'.img_picto($langs->trans("ViewPrivateNote"),'object_generic').'</a>';
+			$warnornote.= '</span>';
 		}
-		print '</td>';
-
-		// Ref
+		if ($warnornote)
+		{
+			print '<td style="min-width: 20px" class="nobordernopadding nowrap">';
+			print $warnornote;
+			print '</td>';
+		}
+		// Other picto tool
 		print '<td width="16" align="right" class="nobordernopadding hideonsmartphone">';
-		$filename=dol_sanitizeFileName($objp->ref);
-		$filedir=$conf->supplier_proposal->dir_output . '/' . dol_sanitizeFileName($objp->ref);
-		$urlsource=$_SERVER['PHP_SELF'].'?id='.$objp->supplier_proposalid;
+		$filename=dol_sanitizeFileName($obj->ref);
+		$filedir=$conf->supplier_proposal->dir_output . '/' . dol_sanitizeFileName($obj->ref);
+		$urlsource=$_SERVER['PHP_SELF'].'?id='.$obj->rowid;
 		print $formfile->getDocumentsLink($objectstatic->element, $filename, $filedir);
 		print '</td></tr></table>';
 
 		print "</td>\n";
 
-		$url = DOL_URL_ROOT.'/comm/card.php?socid='.$objp->rowid;
+		$url = DOL_URL_ROOT.'/comm/card.php?socid='.$obj->socid;
 
 		// Company
-		$companystatic->id=$objp->rowid;
-		$companystatic->name=$objp->name;
-		$companystatic->client=$objp->client;
-		$companystatic->code_client=$objp->code_client;
+		$companystatic->id=$obj->socid;
+		$companystatic->name=$obj->name;
+		$companystatic->client=$obj->client;
+		$companystatic->code_client=$obj->code_client;
 		print '<td>';
 		print $companystatic->getNomUrl(1,'customer');
 		print '</td>';
 
-		// Date askprice
+		// Date
 		print '<td align="center">';
-		print dol_print_date($db->jdate($objp->dp), 'day');
+		print dol_print_date($db->jdate($obj->date_valid), 'day');
+		print "</td>\n";
+		
+		// Date delivery
+		print '<td align="center">';
+		print dol_print_date($db->jdate($obj->dp), 'day');
 		print "</td>\n";
 
-		print '<td align="right">'.price($objp->total_ht)."</td>\n";
+		print '<td align="right">'.price($obj->total_ht)."</td>\n";
 
-		$userstatic->id=$objp->fk_user_author;
-		$userstatic->login=$objp->login;
+		$userstatic->id=$obj->fk_user_author;
+		$userstatic->login=$obj->login;
 		print '<td align="center">';
 		if ($userstatic->id) print $userstatic->getLoginUrl(1);
 		else print '&nbsp;';
 		print "</td>\n";
 
-		print '<td align="right">'.$objectstatic->LibStatut($objp->fk_statut,5)."</td>\n";
+		print '<td align="right">'.$objectstatic->LibStatut($obj->fk_statut,5)."</td>\n";
 
-		print '<td>&nbsp;</td>';
+        // Action column
+        print '<td class="nowrap" align="center">';
+        if ($massactionbutton || $massaction)   // If we are in select mode (massactionbutton defined) or if we have already selected and sent an action ($massaction) defined
+        {
+            $selected=0;
+    		if (in_array($obj->rowid, $arrayofselected)) $selected=1;
+    		print '<input id="cb'.$obj->rowid.'" class="flat checkforselect" type="checkbox" name="toselect[]" value="'.$obj->rowid.'"'.($selected?' checked="checked"':'').'>';
+        }
+        print '</td>';
 
 		print "</tr>\n";
 
-		$total += $objp->total_ht;
-		$subtotal += $objp->total_ht;
+		$total += $obj->total_ht;
+		$subtotal += $obj->total_ht;
 
 		$i++;
 	}
@@ -424,14 +500,14 @@ if ($result)
 		if($num<$limit){
 			$var=!$var;
 			print '<tr class="liste_total"><td align="left">'.$langs->trans("TotalHT").'</td>';
-			print '<td colspan="3" align="right">'.price($total).'</td><td colspan="3"></td>';
+			print '<td colspan="4" align="right">'.price($total).'</td><td colspan="3"></td>';
 			print '</tr>';
 		}
 		else
 		{
 			$var=!$var;
 			print '<tr class="liste_total"><td align="left">'.$langs->trans("TotalHTforthispage").'</td>';
-			print '<td colspan="3" align="right">'.price($total).'</td><td colspan="3"></td>';
+			print '<td colspan="4" align="right">'.price($total).'</td><td colspan="3"></td>';
 			print '</tr>';
 		}
 

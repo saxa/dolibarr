@@ -1,9 +1,7 @@
 # Dolibarr language file - Source file is en_US - users
 HRMArea=منطقه HRM
 UserCard=کارت کاربر
-ContactCard=کارت دفتر تلفن
 GroupCard=کارت گروه
-NoContactCard=أي بطاقة اتصالات بين
 Permission=إذن
 Permissions=مجوزها
 EditPassword=ویرایش گذرواژه
@@ -11,8 +9,6 @@ SendNewPassword=دوباره سازی و فرستادن گذرواژه
 ReinitPassword=دوباره سازی گذرواژه
 PasswordChangedTo=گذرواژه تغییر کرد به: %s
 SubjectNewPassword=گذرواژه جدید شما برای Dolibarr
-AvailableRights=مجوزهای اجازه داده شده
-OwnedRights=مالک مجوزها
 GroupRights=مجوزهای گروه
 UserRights=مجوزهای کاربر
 UserGUISetup=پیکربندی نمایش کاربر
@@ -20,35 +16,27 @@ DisableUser=ناپویا کردن
 DisableAUser=ناپویا کردن یک کاربر
 DeleteUser=پاک کردن
 DeleteAUser=پاک کردن یک کاربر
-DisableGroup=ناپویا کردن
-DisableAGroup=ناپویا کردن یک گروه
 EnableAUser=پویا کردن یک کاربر
-EnableAGroup=پویا کردن یک گروه
 DeleteGroup=پاک کردن
 DeleteAGroup=پاک کردن یک گروه
 ConfirmDisableUser=آیا مطمئن هستید که می خواهید <b>کاربر٪ s به</b> غیر فعال کردن؟
-ConfirmDisableGroup=آیا مطمئن هستید که می خواهید <b>گروه٪ s به</b> غیر فعال کردن؟
 ConfirmDeleteUser=آیا مطمئن هستید که می خواهید <b>کاربر٪ s</b> را حذف کنید؟
 ConfirmDeleteGroup=آیا مطمئن هستید که می خواهید <b>گروه٪ s</b> را حذف کنید؟
 ConfirmEnableUser=آیا مطمئن هستید که می خواهید به فعال کردن <b>کاربر٪ s را؟</b>
-ConfirmEnableGroup=آیا مطمئن هستید که می خواهید به فعال کردن <b>گروه٪ s؟</b>
 ConfirmReinitPassword=آیا مطمئن هستید که می خواهید برای تولید یک کلمه رمز جدید برای <b>کاربر٪ s را؟</b>
 ConfirmSendNewPassword=هل تريد بالتأكيد لتوليد وإرسال كلمة مرور جديدة للمستخدم <b>٪ ق؟</b>
 NewUser=کاربر تازه
 CreateUser=ساخت کاربر
-SearchAGroup=جستجوی یک گروه
-SearchAUser=جستجوی یک کاربر
 LoginNotDefined=ورود به تعریف نیست.
 NameNotDefined=اسم غير محدد.
 ListOfUsers=لیست کاربران
 SuperAdministrator=Super Administrator
 SuperAdministratorDesc=administrator  همگانی
 AdministratorDesc=Administrator
-AdministratorDescEntity=Administrator (for its company)
 DefaultRights=مجوزهای پیش پندار
 DefaultRightsDesc=تعریف در اینجا مجوز <u>به طور پیش فرض</u> است که به طور خودکار به یک کاربر <u>جدید ایجاد شده</u> (برو روی کارت کاربر به تغییر مجوز یک کاربر موجود) اعطا می شود.
 DolibarrUsers=Dolibarr کاربران
-LastName=نام
+LastName=Last Name
 FirstName=نام اول
 ListOfGroups=لیست گروهها
 NewGroup=گروه تازه
@@ -57,33 +45,24 @@ RemoveFromGroup=پاک کردن از گروه
 PasswordChangedAndSentTo=تغییر رمز عبور و ارسال <b>به٪ s.</b>
 PasswordChangeRequestSent=درخواست تغییر رمز عبور <b>برای٪ s ارسال به٪ s.</b>
 MenuUsersAndGroups=کاربران و گروهها
-MenuMyUserCard=My user card
-LastGroupsCreated=تاریخ و زمان آخرین٪ گروه های ایجاد شده
-LastUsersCreated=تاریخ و زمان آخرین٪ کاربران ایجاد شده
+LastGroupsCreated=Latest %s created groups
+LastUsersCreated=Latest %s users created
 ShowGroup=نمایش گروه
 ShowUser=نمایش کاربر
 NonAffectedUsers=کاربران غیر اختصاص داده
 UserModified=کاربر با موفقیت به اصلاح
 PhotoFile=فایل نگاره
-UserWithDolibarrAccess=کاربر با دسترسی Dolibarr
 ListOfUsersInGroup=لیست کاربران در این گروه
 ListOfGroupsForUser=لیست گروه های این کاربر
-UsersToAdd=کاربران برای اضافه کردن به این گروه
-GroupsToAdd=گروه برای اضافه کردن به این کاربر
-NoLogin=وارد نشده اید
 LinkToCompanyContact=لینک به شخص ثالث / ارتباط با ما
 LinkedToDolibarrMember=لینک به عضو
 LinkedToDolibarrUser=لینک به کاربر Dolibarr
 LinkedToDolibarrThirdParty=لینک به Dolibarr شخص ثالث
 CreateDolibarrLogin=ساختن یک کاربر
 CreateDolibarrThirdParty=إيجاد طرف ثالث
-LoginAccountDisable=حساب غیر فعال شده، قرار دادن یک ورودی جدید برای آن را فعال کنید.
 LoginAccountDisableInDolibarr=حساب قطع در Dolibarr.
-LoginAccountDisableInLdap=حساب قطع در دامنه.
 UsePersonalValue=استفاده از ارزش های شخصی
-GuiLanguage=زبان رابط
 InternalUser=کاربر داخلی
-MyInformations=دیتای من
 ExportDataset_user_1=کاربران Dolibarr و خواص
 DomainUser=کاربر دامنه از٪ s
 Reactivate=دوباره فعال کردن
@@ -94,8 +73,6 @@ Inherited=به ارث برده
 UserWillBeInternalUser=کاربر های ایجاد شده خواهد بود داخلی (چون به شخص ثالث خاصی پیوند ندارد)
 UserWillBeExternalUser=کاربر ایجاد خواهد شد یک کاربر خارجی (چون به شخص ثالث خاص مرتبط است)
 IdPhoneCaller=شناسه تماس گیرنده تلفن
-UserLogged=کاربر٪ s را وارد
-UserLogoff=کاربر %s خارج شد
 NewUserCreated=کاربر %s ساخته شد
 NewUserPassword=تغییر رمز عبور برای٪ s
 EventUserModified=کاربر٪ s تغییر
@@ -122,3 +99,7 @@ LoginUsingOpenID=استفاده از حساب کاربری برای ورود ب�
 WeeklyHours=Weekly hours
 ColorUser=Color of the user
 DisabledInMonoUserMode=Disabled in maintenance mode
+UserAccountancyCode=User accountancy code
+UserLogoff=User logout
+UserLogged=User logged
+DateEmployment=Date of Employment
