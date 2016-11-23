@@ -181,7 +181,14 @@ class Form
                 else if (preg_match('/^text/',$typeofdata) || preg_match('/^note/',$typeofdata))
                 {
                     $tmp=explode(':',$typeofdata);
-                    $ret.='<textarea id="'.$htmlname.'" name="'.$htmlname.'" wrap="soft" rows="'.($tmp[1]?$tmp[1]:'20').'" cols="'.($tmp[2]?$tmp[2]:'100').'">'.($editvalue?$editvalue:$value).'</textarea>';
+                    $cols=$tmp[2];
+                    $morealt='';
+                    if (preg_match('/%/',$cols))
+                    {
+                        $morealt=' style="width: '.$cols.'"';
+                        $cols='';
+                    }
+                    $ret.='<textarea id="'.$htmlname.'" name="'.$htmlname.'" wrap="soft" rows="'.($tmp[1]?$tmp[1]:'20').'"'.($cols?' cols="'.$cols.'"':'').$morealt.'">'.($editvalue?$editvalue:$value).'</textarea>';
                 }
                 else if ($typeofdata == 'day' || $typeofdata == 'datepicker')
                 {
@@ -211,9 +218,10 @@ class Form
                 if (empty($notabletag)) $ret.='</td>';
 
                 if (empty($notabletag)) $ret.='<td align="left">';
-               	$ret.='<input type="submit" class="button" name="modify" value="'.$langs->trans("Modify").'">';
-               	if (preg_match('/ckeditor|textarea/',$typeofdata)) $ret.='<br>'."\n";
-               	$ret.='<input type="submit" class="button" name="cancel" value="'.$langs->trans("Cancel").'">';
+                else $ret.='<div class="clearboth"></div>';
+               	$ret.='<input type="submit" class="button'.(empty($notabletag)?'':' marginrightonly').'" name="modify" value="'.$langs->trans("Modify").'">';
+               	if (preg_match('/ckeditor|textarea/',$typeofdata) && empty($notabletag)) $ret.='<br>'."\n";
+               	$ret.='<input type="submit" class="button'.(empty($notabletag)?'':' marginrightonly').'" name="cancel" value="'.$langs->trans("Cancel").'">';
                	if (empty($notabletag)) $ret.='</td>';
 
                	if (empty($notabletag)) $ret.='</tr></table>'."\n";
@@ -501,11 +509,12 @@ class Form
     /**
      * Generate select HTML to choose massaction
      *
-     * @param	string	$selected		Selected value
+     * @param	string	$selected		Value auto selected when at least one record is selected. Not a preselected value. Use '0' by default.
      * @param	int		$arrayofaction	array('code'=>'label', ...). The code is the key stored into the GETPOST('massaction') when submitting action.
+     * @param   int     $alwaysvisible  1=select button always visible 
      * @return	string					Select list
      */
-    function selectMassAction($selected, $arrayofaction)
+    function selectMassAction($selected, $arrayofaction, $alwaysvisible=0)
     {
     	global $conf,$langs,$hookmanager;
 
@@ -513,7 +522,7 @@ class Form
 
     	$disabled=0;
     	$ret='<div class="centpercent center">';
-    	$ret.='<select data-role="none" class="flat hideobject massaction massactionselect" name="massaction"'.($disabled?' disabled="disabled"':'').'>';
+    	$ret.='<select data-role="none" class="flat'.(empty($conf->use_javascript_ajax)?'':' hideobject').' massaction massactionselect" name="massaction"'.($disabled?' disabled="disabled"':'').'>';
     	$ret.='<option value="0"'.($disabled?' disabled="disabled"':'').'>-- '.$langs->trans("SelectAction").' --</option>';
     	foreach($arrayofaction as $code => $label)
     	{
@@ -521,50 +530,55 @@ class Form
     	}
     	$ret.='</select>';
     	// Warning: if you set submit button to disabled, post using 'Enter' will no more work.
-    	$ret.='<input type="submit" data-role="none" name="confirmmassaction" class="button hideobject massaction massactionconfirmed" value="'.dol_escape_htmltag($langs->trans("Confirm")).'">';
+    	$ret.='<input type="submit" data-role="none" name="confirmmassaction" class="button'.(empty($conf->use_javascript_ajax)?'':' hideobject').' massaction massactionconfirmed" value="'.dol_escape_htmltag($langs->trans("Confirm")).'">';
     	$ret.='</div>';
 
-    	$ret.='<!-- JS CODE TO ENABLE mass action select -->
-		<script type="text/javascript">
-    		function initCheckForSelect()
-    		{
-    			atleastoneselected=0;
-	    		jQuery(".checkforselect").each(function( index ) {
-	  				/* console.log( index + ": " + $( this ).text() ); */
-	  				if ($(this).is(\':checked\')) atleastoneselected++;
-	  			});
-	  			if (atleastoneselected)
-	  			{
-	  				jQuery(".massaction").show();
-	  			}
-	  			else
-	  			{
-	  				jQuery(".massaction").hide();
-	  			}
-    		}
-
-    	jQuery(document).ready(function () {
-    		initCheckForSelect();
-    		jQuery(".checkforselect").click(function() {
-    			initCheckForSelect();
-	  		});
-    	    /* Warning: if you set submit button to disabled, post using Enter will no more work
-	  		jQuery(".massactionselect").change(function() {
-	  			console.log( $( this ).val() );
-	  			if ($(this).val() != \'0\')
-	  			{
-	  				jQuery(".massactionconfirmed").prop(\'disabled\', false);
-	  			}
-	  			else
-	  			{
-	  				jQuery(".massactionconfirmed").prop(\'disabled\', true);
-	  			}
-	  		});
-    	    */
-    	});
-		</script>
-    	';
-
+    	if (! empty($conf->use_javascript_ajax))
+    	{
+        	$ret.='<!-- JS CODE TO ENABLE mass action select -->
+    		<script type="text/javascript">
+        		function initCheckForSelect()
+        		{
+        			atleastoneselected=0;
+    	    		jQuery(".checkforselect").each(function( index ) {
+    	  				/* console.log( index + ": " + $( this ).text() ); */
+    	  				if ($(this).is(\':checked\')) atleastoneselected++;
+    	  			});
+    	  			if (atleastoneselected || '.$alwaysvisible.')
+    	  			{
+    	  				jQuery(".massaction").show();
+        			    '.($selected ? 'if (atleastoneselected) jQuery(".massactionselect").val("'.$selected.'");' : '').'
+        			    '.($selected ? 'if (! atleastoneselected) jQuery(".massactionselect").val("0");' : '').'
+    	  			}
+    	  			else
+    	  			{
+    	  				jQuery(".massaction").hide();
+    	            }
+        		}
+    
+        	jQuery(document).ready(function () {
+        		initCheckForSelect();
+        		jQuery(".checkforselect").click(function() {
+        			initCheckForSelect();
+    	  		});
+        	    /* Warning: if you set submit button to disabled, post using Enter will no more work
+    	  		jQuery(".massactionselect").change(function() {
+    	  			console.log( $( this ).val() );
+    	  			if ($(this).val() != \'0\')
+    	  			{
+    	  				jQuery(".massactionconfirmed").prop(\'disabled\', false);
+    	  			}
+    	  			else
+    	  			{
+    	  				jQuery(".massactionconfirmed").prop(\'disabled\', true);
+    	  			}
+    	  		});
+        	    */
+        	});
+    		</script>
+        	';
+    	}
+    	
     	return $ret;
     }
 
@@ -734,7 +748,7 @@ class Form
             }
             $out.= '</select>';
 
-			$out .= '<input id="location_incoterms" name="location_incoterms" size="14" value="'.$location_incoterms.'">';
+			$out .= '<input id="location_incoterms" class="maxwidth100onsmartphone" name="location_incoterms" value="'.$location_incoterms.'">';
 
 			if (!empty($page))
 			{
@@ -1445,7 +1459,8 @@ class Form
 		            $nodatarole=($comboenhancement?' data-role="none"':'');
 		        }
 
-                $out.= '<select class="flat maxwidth200onsmartphone'.($morecss?' minwidth100 '.$morecss:' minwidth200').'" id="'.$htmlname.'" name="'.$htmlname.'"'.($disabled?' disabled':'').$nodatarole.'>';
+		        // do not use maxwidthonsmartphone by default. Set it by caller so auto size to 100% will work when not defined
+                $out.= '<select class="flat'.($morecss?' minwidth100 '.$morecss:' minwidth200').'" id="'.$htmlname.'" name="'.$htmlname.'"'.($disabled?' disabled':'').$nodatarole.'>';
                 if ($show_empty) $out.= '<option value="-1"'.((empty($selected) || $selected==-1)?' selected':'').'>&nbsp;</option>'."\n";
 				if ($show_every) $out.= '<option value="-2"'.(($selected==-2)?' selected':'').'>-- '.$langs->trans("Everybody").' --</option>'."\n";
 
@@ -2792,7 +2807,9 @@ class Form
 
 
     /**
-     *      Return list of payment modes
+     *      Return list of payment modes.
+     *      Constant MAIN_DEFAULT_PAYMENT_TERM_ID can used to set default value but scope is all application, probably not what you want.
+     *      See instead to force the default value by the caller.
      *
      *      @param	int  	$selected        Id of payment term to preselect by default
      *      @param  string	$htmlname        Nom de la zone select
@@ -3334,7 +3351,7 @@ class Form
             }
 
         	// Now add questions
-            $more.='<table class="paddingrightonly" width="100%">'."\n";
+            $more.='<table class="paddingtopbottomonly" width="100%">'."\n";
             $more.='<tr><td colspan="3">'.(! empty($formquestion['text'])?$formquestion['text']:'').'</td></tr>'."\n";
             foreach ($formquestion as $key => $input)
             {
@@ -4485,7 +4502,7 @@ class Form
                 if ($usecalendar == "eldy")
                 {
                     // Zone de saisie manuelle de la date
-                    $retstring.='<input id="'.$prefix.'" name="'.$prefix.'" type="text" size="9" maxlength="11" value="'.$formated_date.'"';
+                    $retstring.='<input id="'.$prefix.'" name="'.$prefix.'" type="text" class="maxwidth75" maxlength="11" value="'.$formated_date.'"';
                     $retstring.=($disabled?' disabled':'');
                     $retstring.=' onChange="dpChangeDay(\''.$prefix.'\',\''.$langs->trans("FormatDateShortJavaInput").'\'); "';  // FormatDateShortInput for dol_print_date / FormatDateShortJavaInput that is same for javascript
                     $retstring.='>';
@@ -4513,7 +4530,7 @@ class Form
 			{
 			    //$retstring.='<div class="inline-block">';
                 // Day
-                $retstring.='<select'.($disabled?' disabled':'').' class="flat" id="'.$prefix.'day" name="'.$prefix.'day">';
+                $retstring.='<select'.($disabled?' disabled':'').' class="flat valignmiddle maxwidth50imp" id="'.$prefix.'day" name="'.$prefix.'day">';
 
                 if ($emptydate || $set_time == -1)
                 {
@@ -4527,7 +4544,7 @@ class Form
 
                 $retstring.="</select>";
 
-                $retstring.='<select'.($disabled?' disabled':'').' class="flat" id="'.$prefix.'month" name="'.$prefix.'month">';
+                $retstring.='<select'.($disabled?' disabled':'').' class="flat valignmiddle maxwidth50onsmartphone" id="'.$prefix.'month" name="'.$prefix.'month">';
                 if ($emptydate || $set_time == -1)
                 {
                     $retstring.='<option value="0" selected>&nbsp;</option>';
@@ -4545,11 +4562,11 @@ class Form
                 // Year
                 if ($emptydate || $set_time == -1)
                 {
-                    $retstring.='<input'.($disabled?' disabled':'').' placeholder="'.dol_escape_htmltag($langs->trans("Year")).'" class="flat" type="text" size="3" maxlength="4" id="'.$prefix.'year" name="'.$prefix.'year" value="'.$syear.'">';
+                    $retstring.='<input'.($disabled?' disabled':'').' placeholder="'.dol_escape_htmltag($langs->trans("Year")).'" class="flat maxwidth50imp" type="text" maxlength="4" id="'.$prefix.'year" name="'.$prefix.'year" value="'.$syear.'">';
                 }
                 else
                 {
-                    $retstring.='<select'.($disabled?' disabled':'').' class="flat" id="'.$prefix.'year" name="'.$prefix.'year">';
+                    $retstring.='<select'.($disabled?' disabled':'').' class="flat valignmiddle maxwidth75" id="'.$prefix.'year" name="'.$prefix.'year">';
 
                     for ($year = $syear - 5; $year < $syear + 10 ; $year++)
                     {
@@ -4566,7 +4583,7 @@ class Form
         if ($h)
         {
             // Show hour
-            $retstring.='<select'.($disabled?' disabled':'').' class="flat '.($fullday?$fullday.'hour':'').'" id="'.$prefix.'hour" name="'.$prefix.'hour">';
+            $retstring.='<select'.($disabled?' disabled':'').' class="flat valignmiddle maxwidth50 '.($fullday?$fullday.'hour':'').'" id="'.$prefix.'hour" name="'.$prefix.'hour">';
             if ($emptyhours) $retstring.='<option value="-1">&nbsp;</option>';
             for ($hour = 0; $hour < 24; $hour++)
             {
@@ -4580,7 +4597,7 @@ class Form
         if ($m)
         {
             // Show minutes
-            $retstring.='<select'.($disabled?' disabled':'').' class="flat '.($fullday?$fullday.'min':'').'" id="'.$prefix.'min" name="'.$prefix.'min">';
+            $retstring.='<select'.($disabled?' disabled':'').' class="flat valignmiddle maxwidth50 '.($fullday?$fullday.'min':'').'" id="'.$prefix.'min" name="'.$prefix.'min">';
             if ($emptyhours) $retstring.='<option value="-1">&nbsp;</option>';
             for ($min = 0; $min < 60 ; $min++)
             {
@@ -5215,7 +5232,7 @@ class Form
 
         if (empty($reshook))
         {
-        	$num = count($object->linkedObjects);
+        	$nbofdifferenttypes = count($object->linkedObjects);
 
         	print '<br>';
             print load_fiche_titre($langs->trans('RelatedObjects'), $morehtmlright, '');
@@ -5232,7 +5249,7 @@ class Form
             print '<td></td>';
             print '</tr>';
 
-            $numoutput=0;
+            $nboftypesoutput=0;
 
         	foreach($object->linkedObjects as $objecttype => $objects)
         	{
@@ -5292,23 +5309,28 @@ class Form
         		$dirtpls=array_merge($conf->modules_parts['tpl'],array('/'.$tplpath.'/tpl'));
         		foreach($dirtpls as $reldir)
         		{
+        		    if ($nboftypesoutput == ($nbofdifferenttypes - 1))    // No more type to show after
+        		    {
+        		        global $noMoreLinkedObjectBlockAfter;
+        		        $noMoreLinkedObjectBlockAfter=1;
+        		    }
                     $res=@include dol_buildpath($reldir.'/'.$tplname.'.tpl.php');
         			if ($res)
         			{
-        			    $numoutput++;
+        			    $nboftypesoutput++;
         			    break;
         			}
         		}
         	}
 
-        	if (! $numoutput)
+        	if (! $nboftypesoutput)
         	{
         	    print '<tr><td class="opacitymedium" colspan="7">'.$langs->trans("None").'</td></tr>';
         	}
 
         	print '</table>';
 
-        	return $num;
+        	return $nbofdifferenttypes;
         }
     }
 
@@ -5565,32 +5587,9 @@ class Form
         $next_ref     = $object->ref_next?'<a data-role="button" data-icon="arrow-r" data-iconpos="right" href="'.$_SERVER["PHP_SELF"].'?'.$paramid.'='.urlencode($object->ref_next).$moreparam.'">'.(($conf->dol_use_jmobile != 4)?'&gt;':'&nbsp;').'</a>':'<span class="inactive">'.(($conf->dol_use_jmobile != 4)?'&gt;':'&nbsp;').'</span>';
 
         //print "xx".$previous_ref."x".$next_ref;
-        $ret.='<div style="vertical-align: middle">';
+        $ret.='<!-- Start banner content --><div style="vertical-align: middle">';
 
-		if ($morehtmlleft) 
-		{
-		    if ($conf->browser->layout == 'phone') $ret.='<div class="center">'.$morehtmlleft.'</div>';
-		    else $ret.='<div class="inline-block floatleft">'.$morehtmlleft.'</div>';
-		}
-
-        $ret.='<div class="inline-block floatleft valignmiddle refid'.(($shownav && ($previous_ref || $next_ref))?' refidpadding':'').'">';
-
-        // For thirdparty, contact, user, member, the ref is the id, so we show something else
-        if ($object->element == 'societe')
-        {
-        	$ret.=dol_htmlentities($object->name);
-        }
-        else if (in_array($object->element, array('contact', 'user', 'member')))
-        {
-        	$ret.=dol_htmlentities($object->getFullName($langs));
-        }
-        else if ($fieldref != 'none') $ret.=dol_htmlentities($object->$fieldref);
-        if ($morehtmlref)
-        {
-            $ret.=' '.$morehtmlref;
-        }
-		$ret.='</div>';
-
+        // Right part of banner
 		if ($morehtmlright) $ret.='<div class="inline-block floatleft">'.$morehtmlright.'</div>';
 
         if ($previous_ref || $next_ref || $morehtml)
@@ -5611,7 +5610,34 @@ class Form
             $ret.='</ul></div>';
         }
 		if ($morehtmlstatus) $ret.='<div class="statusref">'.$morehtmlstatus.'</div>';
-        $ret.='</div>';
+
+        // Left part of banner
+		if ($morehtmlleft)
+		{
+		    if ($conf->browser->layout == 'phone') $ret.='<div class="floatleft">'.$morehtmlleft.'</div>';    // class="center" to have photo in middle
+		    else $ret.='<div class="inline-block floatleft">'.$morehtmlleft.'</div>';
+		}
+		
+		//if ($conf->browser->layout == 'phone') $ret.='<div class="clearboth"></div>';
+		$ret.='<div class="inline-block floatleft valignmiddle refid'.(($shownav && ($previous_ref || $next_ref))?' refidpadding':'').'">';
+		
+		// For thirdparty, contact, user, member, the ref is the id, so we show something else
+		if ($object->element == 'societe')
+		{
+		    $ret.=dol_htmlentities($object->name);
+		}
+		else if (in_array($object->element, array('contact', 'user', 'member')))
+		{
+		    $ret.=dol_htmlentities($object->getFullName($langs));
+		}
+		else if ($fieldref != 'none') $ret.=dol_htmlentities($object->$fieldref);
+		if ($morehtmlref)
+		{
+		    $ret.=' '.$morehtmlref;
+		}
+		$ret.='</div>';		
+		
+		$ret.='</div><!-- End banner content -->';
 
         return $ret;
     }
@@ -5678,6 +5704,7 @@ class Form
                 else $file=get_exdir(0, 0, 0, 0, $object, 'thirdparty').'/logos/'.$object->logo;
                 $originalfile=get_exdir(0, 0, 0, 0, $object, 'thirdparty').'/logos/'.$object->logo;
             }
+            $email=$object->email;
         }
         else if ($modulepart=='contact')
         {
@@ -5689,6 +5716,7 @@ class Form
                 else $file=get_exdir(0, 0, 0, 0, $object, 'contact').'/photos/'.$object->photo;
                 $originalfile=get_exdir(0, 0, 0, 0, $object, 'contact').'/photos/'.$object->photo;
             }
+            $email=$object->email;
         }
         else if ($modulepart=='userphoto')
         {
@@ -5785,10 +5813,10 @@ class Form
             if ($caneditfield)
             {
                 if ($object->photo) $ret.="<br>\n";
-                $ret.='<table class="nobordernopadding">';
-                if ($object->photo) $ret.='<tr><td align="center"><input type="checkbox" class="flat photodelete" name="deletephoto" id="photodelete"> '.$langs->trans("Delete").'<br><br></td></tr>';
+                $ret.='<table class="nobordernopadding centpercent">';
+                if ($object->photo) $ret.='<tr><td><input type="checkbox" class="flat photodelete" name="deletephoto" id="photodelete"> '.$langs->trans("Delete").'<br><br></td></tr>';
                 $ret.='<tr><td>'.$langs->trans("PhotoFile").'</td></tr>';
-                $ret.='<tr><td><input type="file" class="flat" name="photo" id="photoinput"></td></tr>';
+                $ret.='<tr><td class="tdoverflow"><input type="file" class="flat maxwidth200onsmartphone" name="photo" id="photoinput"></td></tr>';
                 $ret.='</table>';
             }
 

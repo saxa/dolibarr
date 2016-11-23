@@ -46,7 +46,7 @@ if (! empty($conf->ldap->enabled)) require_once DOL_DOCUMENT_ROOT.'/core/class/l
 if (! empty($conf->adherent->enabled)) require_once DOL_DOCUMENT_ROOT.'/adherents/class/adherent.class.php';
 if (! empty($conf->multicompany->enabled)) dol_include_once('/multicompany/class/actions_multicompany.class.php');
 if (! empty($conf->categorie->enabled)) require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
-
+c
 
 $id			= GETPOST('id','int');
 $action		= GETPOST('action','alpha');
@@ -733,7 +733,7 @@ if (($action == 'create') || ($action == 'adduserldap'))
     }
     else
     {
-        print '<input size="30" type="text" id="lastname" name="lastname" value="'.GETPOST('lastname').'">';
+        print '<input class="minwidth100" type="text" id="lastname" name="lastname" value="'.GETPOST('lastname').'">';
     }
     print '</td></tr>';
 
@@ -747,7 +747,7 @@ if (($action == 'create') || ($action == 'adduserldap'))
     }
     else
     {
-        print '<input size="30" type="text" name="firstname" value="'.GETPOST('firstname').'">';
+        print '<input class="minwidth100" type="text" name="firstname" value="'.GETPOST('firstname').'">';
     }
     print '</td></tr>';
 
@@ -760,7 +760,7 @@ if (($action == 'create') || ($action == 'adduserldap'))
     // Position/Job
     print '<tr><td>'.$langs->trans("PostOrFunction").'</td>';
     print '<td>';
-    print '<input size="30" type="text" name="job" value="'.GETPOST('job').'">';
+    print '<input class="maxwidth200" type="text" name="job" value="'.GETPOST('job').'">';
     print '</td></tr>';
 
     // Gender
@@ -785,7 +785,7 @@ if (($action == 'create') || ($action == 'adduserldap'))
     }
     else
     {
-        print '<input size="20" maxsize="24" type="text" name="login" value="'.GETPOST('login').'">';
+        print '<input class="maxwidth200" maxsize="24" type="text" name="login" value="'.GETPOST('login').'">';
     }
     print '</td></tr>';
 
@@ -1802,7 +1802,7 @@ else
             print '<td>';
             if ($caneditfield && !$object->ldap_sid)
             {
-                print '<input size="30" type="text" class="flat" name="lastname" value="'.$object->lastname.'">';
+                print '<input class="minwidth100" type="text" class="flat" name="lastname" value="'.$object->lastname.'">';
             }
             else
             {
@@ -1817,7 +1817,7 @@ else
             print '<td>';
             if ($caneditfield && !$object->ldap_sid)
             {
-                print '<input size="30" type="text" class="flat" name="firstname" value="'.$object->firstname.'">';
+                print '<input class="minwidth100" type="text" class="flat" name="firstname" value="'.$object->firstname.'">';
             }
             else
             {
@@ -1829,8 +1829,8 @@ else
             // Photo
             print '<tr>';
             print '<td>'.$langs->trans("Photo").'</td>';
-            print '<td valign="middle">';
-            print $form->showphoto('userphoto',$object,100,0,$caneditfield,'photowithmargin','small');
+            print '<td>';
+            print $form->showphoto('userphoto',$object,60,0,$caneditfield,'photowithmargin','small');
             print '</td>';
             print '</tr>';
 
@@ -1902,7 +1902,7 @@ else
             if(! empty($conf->api->enabled) && $user->admin) {
                 print '<tr><td>'.$langs->trans("ApiKey").'</td>';
                 print '<td>';
-                print '<input size="30" maxsize="32" type="text" id="api_key" name="api_key" value="'.$object->api_key.'" autocomplete="off">';
+                print '<input class="minwidth100" maxsize="32" type="text" id="api_key" name="api_key" value="'.$object->api_key.'" autocomplete="off">';
                 if (! empty($conf->use_javascript_ajax))
                     print '&nbsp;'.img_picto($langs->trans('Generate'), 'refresh', 'id="generate_api_key" class="linkobject"');
                 print '</td></tr>';
@@ -1992,7 +1992,7 @@ else
             }
 
            	// Type
-           	print '<tr><td width="25%">'.$langs->trans("Type").'</td>';
+           	print '<tr><td>'.$langs->trans("Type").'</td>';
            	print '<td>';
            	if ($user->id == $object->id || ! $user->admin)
            	{
@@ -2035,7 +2035,7 @@ else
             // State
             if (empty($conf->global->USER_DISABLE_STATE))
             {
-                print '<tr><td>'.fieldLabel('State','state_id').'</td><td>';
+                print '<tr><td class="tdoverflow">'.fieldLabel('State','state_id').'</td><td>';
                 print $formcompany->select_state($object->state_id,$object->country_code, 'state_id');
                 print '</td></tr>';
             }
@@ -2104,7 +2104,7 @@ else
             print '<td>';
             if ($caneditfield  && empty($object->ldap_sid))
             {
-                print '<input size="40" type="text" name="email" class="flat" value="'.$object->email.'">';
+                print '<input class="minwidth100" type="text" name="email" class="flat" value="'.$object->email.'">';
             }
             else
             {
@@ -2135,7 +2135,7 @@ else
                 print '<td>';
                 if ($caneditfield)
                 {
-                    print '<input size="40" type="url" name="openid" class="flat" value="'.$object->openid.'">';
+                    print '<input class="minwidth100" type="url" name="openid" class="flat" value="'.$object->openid.'">';
                 }
                 else
               {

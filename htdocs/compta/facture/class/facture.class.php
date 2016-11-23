@@ -2821,7 +2821,8 @@ class Facture extends CommonInvoice
 	 */
 	function deleteline($rowid)
 	{
-
+        global $user;
+        
 		dol_syslog(get_class($this)."::deleteline rowid=".$rowid, LOG_DEBUG);
 
 		if (! $this->brouillon)
@@ -2847,13 +2848,14 @@ class Facture extends CommonInvoice
 		}
 
 		$line=new FactureLigne($this->db);
-
+		
         $line->context = $this->context;
 
 		// For triggers
-		$line->fetch($rowid);
-
-		if ($line->delete() > 0)
+		$result = $line->fetch($rowid);
+		if (! ($result > 0)) dol_print_error($db, $line->error, $line->errors);
+		
+		if ($line->delete($user) > 0)
 		{
 			$result=$this->update_price(1);
 
@@ -4208,13 +4210,13 @@ class FactureLigne extends CommonInvoiceLine
 		$sql.= ' fd.date_start as date_start, fd.date_end as date_end, fd.fk_product_fournisseur_price as fk_fournprice, fd.buy_price_ht as pa_ht,';
 		$sql.= ' fd.info_bits, fd.special_code, fd.total_ht, fd.total_tva, fd.total_ttc, fd.total_localtax1, fd.total_localtax2, fd.rang,';
 		$sql.= ' fd.fk_code_ventilation,';
-		$sql.= ' fd.fk_unit,';
+		$sql.= ' fd.fk_unit, fd.fk_user_author, fd.fk_user_modif,';
 		$sql.= ' fd.situation_percent, fd.fk_prev_id,';
+		$sql.= ' fd.multicurrency_subprice,';
+		$sql.= ' fd.multicurrency_total_ht,';
+		$sql.= ' fd.multicurrency_total_tva,';
+		$sql.= ' fd.multicurrency_total_ttc,';
 		$sql.= ' p.ref as product_ref, p.label as product_libelle, p.description as product_desc';
-		$sql.= ' , fd.multicurrency_subprice';
-		$sql.= ' , fd.multicurrency_total_ht';
-		$sql.= ' , fd.multicurrency_total_tva';
-		$sql.= ' , fd.multicurrency_total_ttc';
 		$sql.= ' FROM '.MAIN_DB_PREFIX.'facturedet as fd';
 		$sql.= ' LEFT JOIN '.MAIN_DB_PREFIX.'product as p ON fd.fk_product = p.rowid';
 		$sql.= ' WHERE fd.rowid = '.$rowid;
@@ -4261,7 +4263,9 @@ class FactureLigne extends CommonInvoiceLine
 			$this->product_label		= $objp->product_libelle;
 			$this->product_desc			= $objp->product_desc;
 			$this->fk_unit				= $objp->fk_unit;
-
+			$this->fk_user_modif		= $objp->fk_user_modif;
+			$this->fk_user_author		= $objp->fk_user_author;
+			
 			$this->situation_percent    = $objp->situation_percent;
 			$this->fk_prev_id           = $objp->fk_prev_id;
 
@@ -4276,6 +4280,7 @@ class FactureLigne extends CommonInvoiceLine
 		}
 		else
 		{
+		    $this->error = $this->db->lasterror();
 			return -1;
 		}
 	}
@@ -4361,8 +4366,8 @@ class FactureLigne extends CommonInvoiceLine
 		$sql.= ' rang, special_code, fk_product_fournisseur_price, buy_price_ht,';
 		$sql.= ' info_bits, total_ht, total_tva, total_ttc, total_localtax1, total_localtax2,';
 		$sql.= ' situation_percent, fk_prev_id,';
-		$sql.= ' fk_unit';
-		$sql.= ', fk_multicurrency, multicurrency_code, multicurrency_subprice, multicurrency_total_ht, multicurrency_total_tva, multicurrency_total_ttc';
+		$sql.= ' fk_unit, fk_user_author, fk_user_modif,';
+		$sql.= ' fk_multicurrency, multicurrency_code, multicurrency_subprice, multicurrency_total_ht, multicurrency_total_tva, multicurrency_total_ttc';
 		$sql.= ')';
 		$sql.= " VALUES (".$this->fk_facture.",";
 		$sql.= " ".($this->fk_parent_line>0?"'".$this->fk_parent_line."'":"null").",";
@@ -4393,9 +4398,11 @@ class FactureLigne extends CommonInvoiceLine
 		$sql.= " ".price2num($this->total_ttc).",";
 		$sql.= " ".price2num($this->total_localtax1).",";
 		$sql.= " ".price2num($this->total_localtax2);
-		$sql .= ", " . $this->situation_percent;
-		$sql .= ", " . $this->fk_prev_id;
-		$sql .= ", ".(!$this->fk_unit ? 'NULL' : $this->fk_unit);
+		$sql.= ", " . $this->situation_percent;
+		$sql.= ", " . $this->fk_prev_id;
+		$sql.= ", ".(!$this->fk_unit ? 'NULL' : $this->fk_unit);
+		$sql.= ", ".$user->id;
+		$sql.= ", ".$user->id;
 		$sql.= ", ".(int) $this->fk_multicurrency;
 		$sql.= ", '".$this->db->escape($this->multicurrency_code)."'";
 		$sql.= ", ".price2num($this->multicurrency_subprice);
@@ -4581,6 +4588,7 @@ class FactureLigne extends CommonInvoiceLine
 		if (! empty($this->rang)) $sql.= ", rang=".$this->rang;
 		$sql.= ", situation_percent=" . $this->situation_percent;
 		$sql.= ", fk_unit=".(!$this->fk_unit ? 'NULL' : $this->fk_unit);
+		$sql.= ", fk_user_modif =".$user->id;
 
 		// Multicurrency
 		$sql.= ", multicurrency_subprice=".price2num($this->multicurrency_subprice)."";
@@ -4628,8 +4636,9 @@ class FactureLigne extends CommonInvoiceLine
 
 	/**
 	 * 	Delete line in database
-	 *
-	 *	@return		int		<0 if KO, >0 if OK
+	 *  TODO Add param User $user and notrigger (see skeleton)
+     *
+	 *	@return	    int		           <0 if KO, >0 if OK
 	 */
 	function delete()
 	{

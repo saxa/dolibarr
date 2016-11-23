@@ -613,6 +613,9 @@ NoFileFound=No documents saved in this directory
 CurrentUserLanguage=Current language
 CurrentTheme=Current theme
 CurrentMenuManager=Current menu manager
+Browser=Browser
+Layout=Layout
+Screen=Screen
 DisabledModules=Disabled modules
 For=For
 ForCustomer=For customer
@@ -743,6 +746,7 @@ Calendar=Calendar
 GroupBy=Group by...
 ViewFlatList=View flat list
 RemoveString=Remove string '%s'
+SomeTranslationAreUncomplete=Some languages may be partially translated or may contains errors. If you detect some, you can fix language files registering to <a href="https://transifex.com/projects/p/dolibarr/" target="_blank">http://transifex.com/projects/p/dolibarr/</a>. 
 # Week day
 Monday=Monday
 Tuesday=Tuesday
