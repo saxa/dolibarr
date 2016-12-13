@@ -1055,9 +1055,16 @@ function dol_banner_tab($object, $paramid, $morehtml='', $shownav=1, $fieldid='r
 	    if (empty($tmptxt) || $tmptxt == $object->getLibStatut(3) || $conf->browser->layout=='phone') $tmptxt=$object->getLibStatut(5, $object->totalpaye); 
 		$morehtmlstatus.=$tmptxt;
 	}
-	elseif ($object->element == 'facturerec') 
+	elseif ($object->element == 'chargesociales')
 	{
-	    $morehtmlstatus.='<!-- No status for recurring invoice -->';
+	    $tmptxt=$object->getLibStatut(6, $object->totalpaye);
+	    if (empty($tmptxt) || $tmptxt == $object->getLibStatut(3) || $conf->browser->layout=='phone') $tmptxt=$object->getLibStatut(5, $object->totalpaye); 
+		$morehtmlstatus.=$tmptxt;
+	}
+	elseif ($object->element == 'contrat') 
+	{
+        if ($object->statut==0) $morehtmlstatus.=$object->getLibStatut(2);
+        else $morehtmlstatus.=$object->getLibStatut(4);
 	}
 	else { // Generic case
 	    $tmptxt=$object->getLibStatut(6);
@@ -1209,6 +1216,7 @@ function dol_strftime($fmt, $ts=false, $is_gmt=false)
  *										"%d %b %Y",
  *										"%d/%m/%Y %H:%M",
  *										"%d/%m/%Y %H:%M:%S",
+ *                                      "%B"=Long text of month, "%A"=Long text of day, "%b"=Short text of month, "%a"=Short text of day
  *										"day", "daytext", "dayhour", "dayhourldap", "dayhourtext", "dayrfc", "dayhourrfc", "...reduceformat"
  * 	@param	string		$tzoutput		true or 'gmt' => string is for Greenwich location
  * 										false or 'tzserver' => output string is for local PHP server TZ usage
@@ -2579,7 +2587,7 @@ function img_warning($titlealt = 'default', $morealt = '')
 
 	if ($titlealt == 'default') $titlealt = $langs->trans('Warning');
 
-	return img_picto($titlealt, 'warning.png', 'class="pictowarning"'.($morealt ? ($morealt == '1' ? ' style="float: right"' : ' '.$morealt): ''));
+	return img_picto($titlealt, 'warning.png', 'class="pictowarning valignmiddle"'.($morealt ? ($morealt == '1' ? ' style="float: right"' : ' '.$morealt): ''));
 }
 
 /**
@@ -3168,7 +3176,7 @@ function load_fiche_titre($titre, $morehtmlright='', $picto='title_generic.png',
  *  @param  int         $hideselectlimit    Force to hide select limit
  *	@return	void
  */
-function print_barre_liste($titre, $page, $file, $options='', $sortfield='', $sortorder='', $center='', $num=-1, $totalnboflines=0, $picto='title_generic.png', $pictoisfullpath=0, $morehtml='', $morecss='', $limit=-1, $hideselectlimit=0)
+function print_barre_liste($titre, $page, $file, $options='', $sortfield='', $sortorder='', $center='', $num=-1, $totalnboflines=-1, $picto='title_generic.png', $pictoisfullpath=0, $morehtml='', $morecss='', $limit=-1, $hideselectlimit=0)
 {
 	global $conf,$langs;
 	
@@ -3198,7 +3206,7 @@ function print_barre_liste($titre, $page, $file, $options='', $sortfield='', $so
 	print '<td class="nobordernopadding valignmiddle">';
 	if ($picto && $titre) print img_picto('', $picto, 'class="hideonsmartphone valignmiddle" id="pictotitle"', $pictoisfullpath);
 	print '<div class="titre inline-block">'.$titre;
-	if (!empty($titre) && $savtotalnboflines > 0) print ' ('.$totalnboflines.')';
+	if (!empty($titre) && $savtotalnboflines >= 0) print ' ('.$totalnboflines.')';
 	print '</div></td>';
 
 	// Center
@@ -4016,7 +4024,7 @@ function get_product_localtax_for_country($idprod, $local, $thirdparty_seller)
 	global $db,$mysoc;
 
 	if (! class_exists('Product')) {
-		require DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
+		require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
 	}
 
 	$ret=0;
@@ -4173,7 +4181,7 @@ function get_default_npr(Societe $thirdparty_seller, Societe $thirdparty_buyer, 
 	if ($idprodfournprice > 0)
 	{
 		if (! class_exists('ProductFournisseur'))
-			require DOL_DOCUMENT_ROOT . '/fourn/class/fournisseur.product.class.php';
+			require_once DOL_DOCUMENT_ROOT . '/fourn/class/fournisseur.product.class.php';
 		$prodprice = new ProductFournisseur($db);
 		$prodprice->fetch_product_fournisseur_price($idprodfournprice);
 		return $prodprice->fourn_tva_npr;
@@ -4181,7 +4189,7 @@ function get_default_npr(Societe $thirdparty_seller, Societe $thirdparty_buyer, 
 	elseif ($idprod > 0)
 	{
 		if (! class_exists('Product'))
-			require DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
+			require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
 		$prod = new Product($db);
 		$prod->fetch($idprod);
 		return $prod->tva_npr;

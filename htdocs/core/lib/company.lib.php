@@ -135,6 +135,8 @@ function societe_prepare_head(Societe $object)
     // Bank accounrs
     if (empty($conf->global->SOCIETE_DISABLE_BANKACCOUNT))
     {
+        $langs->load("banks");
+
         $nbBankAccount=0;
         $head[$h][0] = DOL_URL_ROOT .'/societe/rib.php?socid='.$object->id;
         $head[$h][1] = $langs->trans("BankAccounts");
@@ -1390,7 +1392,7 @@ function show_subsidiaries($conf,$langs,$db,$object)
 	{
 		$socstatic = new Societe($db);
 
-		print load_fiche_titre($langs->trans("Subsidiaries"));
+		print load_fiche_titre($langs->trans("Subsidiaries"), '', '');
 		print "\n".'<table class="noborder" width="100%">'."\n";
 
 		print '<tr class="liste_titre"><td>'.$langs->trans("Company").'</td>';

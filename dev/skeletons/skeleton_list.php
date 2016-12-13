@@ -1,6 +1,7 @@
 <?php
 /* Copyright (C) 2007-2016 Laurent Destailleur  <eldy@users.sourceforge.net>
- * Copyright (C) 2014-2016  Juanjo Menent       <jmenent@2byte.es>
+ * Copyright (C) 2014-2016 Juanjo Menent        <jmenent@2byte.es>
+ * Copyright (C) 2016      Jean-François Ferry	<jfefe@aternatik.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -243,7 +244,7 @@ $sql.=$db->order($sortfield,$sortorder);
 //$sql.= $db->plimit($conf->liste_limit+1, $offset);
 
 // Count total nb of records
-$nbtotalofrecords = 0;
+$nbtotalofrecords = -1;
 if (empty($conf->global->MAIN_DISABLE_FULL_SCANLIST))
 {
 	$result = $db->query($sql);
@@ -333,6 +334,7 @@ if (! empty($moreforfilter))
 $varpage=empty($contextpage)?$_SERVER["PHP_SELF"]:$contextpage;
 $selectedfields=$form->multiSelectArrayWithCheckbox('selectedfields', $arrayfields, $varpage);	// This also change content of $arrayfields
 
+print '<div class="div-table-responsive">';
 print '<table class="tagtable liste'.($moreforfilter?" listwithfilterbefore":"").'">'."\n";
 
 // Fields title
@@ -535,6 +537,7 @@ $reshook=$hookmanager->executeHooks('printFieldListFooter',$parameters);    // N
 print $hookmanager->resPrint;
 
 print '</table>'."\n";
+print '</div>'."\n";
 
 print '</form>'."\n";
 

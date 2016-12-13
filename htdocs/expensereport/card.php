@@ -1240,11 +1240,15 @@ if ($action == 'create')
 	print '<td>';
 	$object = new ExpenseReport($db);
 	$include_users = $object->fetch_users_approver_expensereport();
-	$defaultselectuser=$user->fk_user;	// Will work only if supervisor has permission to approve so is inside include_users
-	if (! empty($conf->global->EXPENSEREPORT_DEFAULT_VALIDATOR)) $defaultselectuser=$conf->global->EXPENSEREPORT_DEFAULT_VALIDATOR;
-	if (GETPOST('fk_user_validator') > 0) $defaultselectuser=GETPOST('fk_user_validator');
-	$s=$form->select_dolusers($defaultselectuser, "fk_user_validator", 1, "", 0, $include_users);
-	print $form->textwithpicto($s, $langs->trans("AnyOtherInThisListCanValidate"));
+	if (empty($include_users)) print img_warning().' '.$langs->trans("NobodyHasPermissionToValidateExpenseReport");
+	else
+	{
+    	$defaultselectuser=$user->fk_user;	// Will work only if supervisor has permission to approve so is inside include_users
+    	if (! empty($conf->global->EXPENSEREPORT_DEFAULT_VALIDATOR)) $defaultselectuser=$conf->global->EXPENSEREPORT_DEFAULT_VALIDATOR;   // Can force default approver
+    	if (GETPOST('fk_user_validator') > 0) $defaultselectuser=GETPOST('fk_user_validator');
+    	$s=$form->select_dolusers($defaultselectuser, "fk_user_validator", 1, "", 0, $include_users);
+    	print $form->textwithpicto($s, $langs->trans("AnyOtherInThisListCanValidate"));
+	}
 	print '</td>';
 	print '</tr>';
 	
@@ -1423,26 +1427,6 @@ else
 				// Other attributes
 				//$cols = 3;
 				//include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_edit.tpl.php';
-				
-				// Public note
-				print '<tr>';
-				print '<td class="border" valign="top">' . $langs->trans('NotePublic') . '</td>';
-				print '<td valign="top">';
-
-				$doleditor = new DolEditor('note_public', $object->note_public, '', 80, 'dolibarr_notes', 'In', 0, false, true, ROWS_3, '90%');
-				print $doleditor->Create(1);
-				print '</td></tr>';
-
-				// Private note
-				if (empty($user->societe_id)) {
-					print '<tr>';
-					print '<td class="border" valign="top">' . $langs->trans('NotePrivate') . '</td>';
-					print '<td valign="top">';
-
-					$doleditor = new DolEditor('note_private', $object->note_private, '', 80, 'dolibarr_notes', 'In', 0, false, true, ROWS_3, '90%');
-					print $doleditor->Create(1);
-					print '</td></tr>';
-				}
 
 				print '</table>';
 
@@ -1620,14 +1604,6 @@ else
 				print '</tr>';
 				*/
 
-				print '<tr>';
-				print '<td>'.$langs->trans("NotePublic").'</td>';
-				print '<td>'.$object->note_public.'</td>';
-				print '</tr>';
-				print '<tr>';
-				print '<td>'.$langs->trans("NotePrivate").'</td>';
-				print '<td>'.$object->note_private.'</td>';
-				print '</tr>';
 				// Amount
 				print '<tr>';
 				print '<td>'.$langs->trans("AmountHT").'</td>';
@@ -2225,7 +2201,8 @@ if ($action != 'create' && $action != 'edit')
 	// If bank module is not used	
 	if (($user->rights->expensereport->to_paid || empty($conf->banque->enabled)) && $object->fk_statut == 5)
 	{
-		if ((round($remaintopay) == 0 || empty($conf->banque->enabled)) && $object->paid == 0)
+		//if ((round($remaintopay) == 0 || empty($conf->banque->enabled)) && $object->paid == 0)
+		if ($object->paid == 0)
 		{
 			print '<div class="inline-block divButAction"><a class="butAction" href="' . $_SERVER["PHP_SELF"] . '?id='.$object->id.'&action=set_paid">'.$langs->trans("ClassifyPaid")."</a></div>";
 		}
@@ -2275,7 +2252,7 @@ print '<div class="fichehalfleft">';
  * Generate documents
  */
 
-if($user->rights->expensereport->export && $action != 'edit')
+if($user->rights->expensereport->export && $action != 'create' && $action != 'edit')
 {
 	$filename	=	dol_sanitizeFileName($object->ref);
 	$filedir	=	$conf->expensereport->dir_output . "/" . dol_sanitizeFileName($object->ref);
